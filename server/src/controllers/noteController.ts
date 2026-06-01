@@ -8,11 +8,14 @@ import {
 } from "../services/noteService";
 
 import { sendSuccess } from "../utils/apiResponse";
+import { noteSchema } from "../validators/notes";
+import logger from "../utils/logger";
 
 export const fetchNotes = async (
     req: Request,
     res: Response
 ) => {
+    logger.info("Fetching all notes");
     const notes = await getAllNotes();
 
     return sendSuccess(
@@ -26,13 +29,8 @@ export const addNote = async (
     req: Request,
     res: Response
 ) => {
-    const { title, content } = req.body;
-
-    if (!title || !content) {
-        throw new Error(
-            "Title and content are required"
-        );
-    }
+    logger.info("Adding a new note", { body: req.body });
+    const { title, content } = noteSchema.parse(req.body);
 
     const note = await createNote(
         title,
@@ -52,6 +50,7 @@ export const deleteNote = async (
     res: Response
 ) => {
     const noteId = Number(req.params.id);
+    logger.info(`Deleting note with id: ${noteId}`);
 
     const deletedNote =
         await deleteNoteById(noteId);
@@ -68,13 +67,8 @@ export const updateNote = async (
     res: Response
 ) => {
     const noteId = Number(req.params.id);
-    const { title, content } = req.body;
-
-    if (!title || !content) {
-        throw new Error(
-            "Title and content are required"
-        );
-    }
+    logger.info(`Updating note with id: ${noteId}`);
+    const { title, content } = noteSchema.parse(req.body);
 
     const updatedNote = await updateNoteById(noteId, title, content);
 
