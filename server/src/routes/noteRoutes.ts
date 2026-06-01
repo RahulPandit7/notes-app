@@ -8,6 +8,8 @@ import {
 } from "../controllers/noteController";
 
 import { asyncHandler } from "../middleware/asyncHandler";
+import { validateRequest } from "../middleware/validateRequest";
+import { noteSchema } from "../validators/notes";
 
 const router = Router();
 
@@ -18,6 +20,7 @@ router.get(
 
 router.post(
     "/",
+    validateRequest(noteSchema, "body"),
     asyncHandler(addNote)
 );
 
@@ -28,6 +31,7 @@ router.delete(
 
 router.put(
     "/:id",
+    validateRequest(noteSchema, "body"),
     asyncHandler(updateNote)
 );
 
