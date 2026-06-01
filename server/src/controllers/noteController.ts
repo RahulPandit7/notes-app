@@ -8,7 +8,6 @@ import {
 } from "../services/noteService";
 
 import { sendSuccess } from "../utils/apiResponse";
-import { noteSchema } from "../validators/notes";
 import logger from "../utils/logger";
 
 export const fetchNotes = async (
@@ -30,7 +29,7 @@ export const addNote = async (
     res: Response
 ) => {
     logger.info("Adding a new note", { body: req.body });
-    const { title, content } = noteSchema.parse(req.body);
+    const { title, content } = req.body;
 
     const note = await createNote(
         title,
@@ -68,7 +67,7 @@ export const updateNote = async (
 ) => {
     const noteId = Number(req.params.id);
     logger.info(`Updating note with id: ${noteId}`);
-    const { title, content } = noteSchema.parse(req.body);
+    const { title, content } = req.body;
 
     const updatedNote = await updateNoteById(noteId, title, content);
 
