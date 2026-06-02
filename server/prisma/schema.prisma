@@ -12,6 +12,13 @@ model Note {
   id        Int      @id @default(autoincrement())
   title     String
   content   String
+
+  isPinned Boolean @default(false)
+  isFavorite Boolean @default(false)
+
+  isDeleted   Boolean   @default(false)
+  deletedAt   DateTime?
+
   createdAt DateTime @default(now())
 }
 /*============================ Note ============================*/

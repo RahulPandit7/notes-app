@@ -5,7 +5,7 @@ import axiosInstance from "../http/axios";
 
 type AxiosBaseQueryArgs = {
     url: string;
-    method: "GET" | "POST" | "PUT" | "DELETE";
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     data?: any;
     params?: any;
 };

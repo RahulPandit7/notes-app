@@ -5,6 +5,12 @@ import {
     addNote,
     deleteNote,
     updateNote,
+    togglePinned,
+    toggleFavorite,
+    fetchNotesStatus,
+    fetchTrashNotes,
+    restoreNote,
+    permanentlyDeleteNote,
 } from "../controllers/noteController";
 
 import { asyncHandler } from "../middleware/asyncHandler";
@@ -33,6 +39,24 @@ router.put(
     "/:id",
     validateRequest(noteSchema, "body"),
     asyncHandler(updateNote)
+);
+
+router.patch("/:id/pin", asyncHandler(togglePinned));
+router.patch("/:id/favorite", asyncHandler(toggleFavorite));
+router.get("/stats", asyncHandler(fetchNotesStatus));
+router.get(
+    "/trash",
+    asyncHandler(fetchTrashNotes)
+);
+
+router.patch(
+    "/:id/restore",
+    asyncHandler(restoreNote)
+);
+
+router.delete(
+    "/:id/permanent",
+    asyncHandler(permanentlyDeleteNote)
 );
 
 export default router;

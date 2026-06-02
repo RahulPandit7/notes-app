@@ -1,5 +1,5 @@
 import { FileText, Plus, Trash, Pin, Star } from "lucide-react";
-import { useGetNotesQuery } from "../store/api/noteApi";
+import { useFetchNoteStatsQuery, useGetNotesQuery } from "../store/api/noteApi";
 import {
     Sidebar,
     SidebarContent,
@@ -21,6 +21,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ onSelectNote, selectedNoteId }: AppSidebarProps) {
     const { data, isLoading } = useGetNotesQuery();
+    const { data: stats } = useFetchNoteStatsQuery();
     const notes = data?.data ?? [];
 
     return (
@@ -36,38 +37,40 @@ export function AppSidebar({ onSelectNote, selectedNoteId }: AppSidebarProps) {
             <SidebarContent>
                 <SidebarGroup>
                     <div className="flex items-center justify-between px-2 mb-2">
-                        <SidebarGroupLabel>Library</SidebarGroupLabel>
+                        <SidebarGroupLabel>YOUR NOTES</SidebarGroupLabel>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onSelectNote(null)}>
+                            <Plus size={16} />
+                        </Button>
                     </div>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton>
+
                                     <FileText className="mr-2 h-4 w-4 opacity-70" />
-                                    <span>All notes</span>
+                                    <div className="flex justify-between items-center w-full">All notes<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.totalCount}</span></div>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton>
                                     <Pin className="mr-2 h-4 w-4 opacity-70" />
-                                    <span>Pinned</span>
+                                    <div className="flex justify-between items-center w-full">Pinned<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.pinnedCount}</span></div>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton>
                                     <Star className="mr-2 h-4 w-4 opacity-70" />
-                                    <span>Favorites</span>
+                                    <div className="flex justify-between items-center w-full">Favorites<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.favoritedCount}</span></div>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
 
-                <SidebarGroup>
+                {/* <SidebarGroup>
                     <div className="flex items-center justify-between px-2 mb-2">
-                        <SidebarGroupLabel>Your Notes</SidebarGroupLabel>
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onSelectNote(null)}>
-                            <Plus size={16} />
-                        </Button>
+                        <SidebarGroupLabel>TAGS</SidebarGroupLabel>
+
                     </div>
                     <SidebarGroupContent>
                         {isLoading ? (
@@ -89,7 +92,7 @@ export function AppSidebar({ onSelectNote, selectedNoteId }: AppSidebarProps) {
                             </SidebarMenu>
                         )}
                     </SidebarGroupContent>
-                </SidebarGroup>
+                </SidebarGroup> */}
 
                 <SidebarGroup>
                     <div className="flex items-center justify-between px-2 mb-2">
@@ -100,7 +103,7 @@ export function AppSidebar({ onSelectNote, selectedNoteId }: AppSidebarProps) {
                             <SidebarMenuItem>
                                 <SidebarMenuButton className="transition-colors text-muted-foreground hover:text-foreground">
                                     <Trash className="mr-2 h-4 w-4 opacity-70" />
-                                    <span>Trash</span>
+                                    <div className="flex justify-between items-center w-full">Trash<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.trashCount}</span></div>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
