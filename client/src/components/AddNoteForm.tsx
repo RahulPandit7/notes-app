@@ -1,7 +1,7 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreateNoteMutation, useUpdateNoteMutation } from "../store/api/noteApi";
-import FormField from "./form/FormField";
+import Editor from "../editor/Editor";
 import { Button } from "./ui/button";
 import { useEffect } from "react";
 import type { Note } from "@/types/note";
@@ -58,7 +58,7 @@ export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormPro
         <FormProvider {...methods}>
             <form
                 onSubmit={methods.handleSubmit(onSubmit)}
-                className="space-y-4 max-w-md bg-card p-6 rounded-lg border shadow-sm"
+                className="space-y-4"
             >
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">{editingNote ? "Update Note" : "Add New Note"}</h2>
@@ -71,16 +71,14 @@ export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormPro
                         </Button>
                     )}
                 </div>
-                <FormField
-                    name="title"
-                    label="Title"
-                />
-                <FormField
-                    name="content"
-                    label="Content"
-                    textarea
-                    rows={4}
-                />
+                <div className="mb-4">
+                    <Editor
+                        title={methods.watch("title")}
+                        content={methods.watch("content")}
+                        onChangeTitle={(val) => methods.setValue("title", val, { shouldValidate: true, shouldDirty: true })}
+                        onChangeContent={(val) => methods.setValue("content", val, { shouldValidate: true, shouldDirty: true })}
+                    />
+                </div>
                 <Button type="submit" disabled={isLoading} className="w-full">
                     {isLoading ? "Saving..." : editingNote ? "Update Note" : "Add Note"}
                 </Button>

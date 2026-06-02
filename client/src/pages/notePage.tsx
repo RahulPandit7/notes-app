@@ -1,7 +1,7 @@
 import { useDeleteNoteMutation, useGetNotesQuery } from "../store/api/noteApi";
 import AddNoteForm from "../components/AddNoteForm";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
-import { Pencil, Trash } from "lucide-react";
+import { Pencil, Pin, Star, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import type { Note } from "@/types/note";
@@ -28,10 +28,10 @@ export default function NotePage() {
     const notes = data?.data ?? [];
 
     return (
-        <div className="container mx-auto p-8 max-w-5xl">
+        <div className="container mx-auto p-8">
             <h1 className="text-3xl font-bold mb-8 text-center">Notes App</h1>
 
-            <div className="grid md:grid-cols-[350px_1fr] gap-8 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 {/* Form Sidebar */}
                 <div className="sticky top-8">
                     <AddNoteForm
@@ -50,22 +50,28 @@ export default function NotePage() {
                             <Card key={note.id}>
                                 <CardHeader className="relative">
                                     <CardTitle>{note.title}</CardTitle>
-                                    <div className="flex gap-2 absolute right-2 top-2">
+                                    <div className="flex gap-1 absolute right-2 top-2">
                                         <Button
                                             onClick={() => setEditingNote({ ...note })}
                                             variant="ghost"
                                             size="icon"
-                                            className="cursor-pointer h-8 w-8"
+                                            className="cursor-pointer h-6 w-6"
                                         >
-                                            <Pencil className="h-4 w-4" />
+                                            <Pencil className="h-3 w-3" />
+                                        </Button>
+                                        <Button className="cursor-pointer h-6 w-6" variant="ghost" size="icon">
+                                            <Pin className="h-3 w-3" />
+                                        </Button>
+                                        <Button className="cursor-pointer h-6 w-6" variant="ghost" size="icon">
+                                            <Star className="h-3 w-3" />
                                         </Button>
                                         <Button
                                             onClick={() => handleDeleteNote(note.id)}
                                             variant="ghost"
                                             size="icon"
-                                            className="cursor-pointer h-8 w-8"
+                                            className="cursor-pointer h-6 w-6"
                                         >
-                                            <Trash className="h-4 w-4" />
+                                            <Trash className="h-2.5 w-2.5" />
                                         </Button>
                                     </div>
                                 </CardHeader>
