@@ -14,6 +14,6 @@ app.use("/notes", noteRoutes);
 app.use(errorMiddleware);
 
 
-app.listen(3000, () => {
+app.listen(3000, "0.0.0.0", () => {
     logger.info("Server running on port 3000");
 });
