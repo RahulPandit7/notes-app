@@ -6,6 +6,8 @@ import { Button } from "./ui/button";
 import { useEffect } from "react";
 import type { Note } from "@/types/note";
 import { noteSchema, type NoteFormType } from "@/validators/note";
+import { closeNoteForm } from "@/store/slices/uiSlice";
+import { useDispatch } from "react-redux";
 
 interface AddNoteFormProps {
     editingNote?: Note | null;
@@ -13,6 +15,7 @@ interface AddNoteFormProps {
 }
 
 export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormProps) {
+    const dispatch = useDispatch();
     const [createNote, { isLoading: isCreating }] = useCreateNoteMutation();
     const [updateNote, { isLoading: isUpdating }] = useUpdateNoteMutation();
 
@@ -47,22 +50,24 @@ export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormPro
                 if (onClearEdit) onClearEdit();
             } else {
                 await createNote(data).unwrap();
+                if (onClearEdit) onClearEdit();
             }
             methods.reset({ title: "", content: "" });
         } catch (error) {
             console.error("Failed to save note:", error);
         }
+        dispatch(closeNoteForm());
     };
 
     return (
         <FormProvider {...methods}>
             <form
                 onSubmit={methods.handleSubmit(onSubmit)}
-                className="space-y-4"
+                className="space-y-4 w-full"
             >
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">{editingNote ? "Update Note" : "Add New Note"}</h2>
-                    {editingNote && (
+                    {(editingNote || onClearEdit) && (
                         <Button type="button" variant="ghost" size="sm" onClick={() => {
                             if (onClearEdit) onClearEdit();
                             methods.reset({ title: "", content: "" });

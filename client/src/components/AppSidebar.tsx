@@ -1,5 +1,3 @@
-import { FileText, Plus, Trash, Pin, Star } from "lucide-react";
-import { useFetchNoteStatsQuery, useGetNotesQuery } from "../store/api/noteApi";
 import {
     Sidebar,
     SidebarContent,
@@ -11,26 +9,36 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { FileText, Pin, Plus, Star, Trash } from "lucide-react";
+import { useFetchNoteStatsQuery } from "../store/api/noteApi";
 import { Button } from "./ui/button";
-import type { Note } from "@/types/note";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { openNoteForm, toggleNoteForm } from "@/store/slices/uiSlice";
+import type { RootState } from "@/store/store";
 
-interface AppSidebarProps {
-    onSelectNote: (note: Note | null) => void;
-    selectedNoteId: number | null;
-}
 
-export function AppSidebar({ onSelectNote, selectedNoteId }: AppSidebarProps) {
-    const { data, isLoading } = useGetNotesQuery();
+export function AppSidebar() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const isFormOpen = useSelector((state: RootState) => state.ui.isNoteFormOpen);
     const { data: stats } = useFetchNoteStatsQuery();
-    const notes = data?.data ?? [];
 
+    const handlePlusClick = () => {
+        navigate("/");
+        if (isFormOpen) {
+            dispatch(toggleNoteForm());
+        } else {
+            dispatch(openNoteForm());
+        }
+    };
     return (
         <Sidebar>
             <SidebarHeader className="p-4">
                 <div className="flex items-center gap-2 font-semibold text-lg">
-                    <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground shadow-sm">
+                    <Link to="/" className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground shadow-sm">
                         <FileText size={18} />
-                    </div>
+                    </Link>
                     Notes
                 </div>
             </SidebarHeader>
@@ -38,17 +46,21 @@ export function AppSidebar({ onSelectNote, selectedNoteId }: AppSidebarProps) {
                 <SidebarGroup>
                     <div className="flex items-center justify-between px-2 mb-2">
                         <SidebarGroupLabel>YOUR NOTES</SidebarGroupLabel>
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onSelectNote(null)}>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={handlePlusClick}
+                        >
                             <Plus size={16} />
                         </Button>
                     </div>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton>
-
+                                <SidebarMenuButton >
                                     <FileText className="mr-2 h-4 w-4 opacity-70" />
-                                    <div className="flex justify-between items-center w-full">All notes<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.totalCount}</span></div>
+                                    <Link to="/notes" className="flex justify-between items-center w-full">All notes<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.totalCount}</span></Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
@@ -67,33 +79,6 @@ export function AppSidebar({ onSelectNote, selectedNoteId }: AppSidebarProps) {
                     </SidebarGroupContent>
                 </SidebarGroup>
 
-                {/* <SidebarGroup>
-                    <div className="flex items-center justify-between px-2 mb-2">
-                        <SidebarGroupLabel>TAGS</SidebarGroupLabel>
-
-                    </div>
-                    <SidebarGroupContent>
-                        {isLoading ? (
-                            <div className="px-4 py-2 text-sm text-muted-foreground">Loading...</div>
-                        ) : (
-                            <SidebarMenu>
-                                {notes.map((note) => (
-                                    <SidebarMenuItem key={note.id}>
-                                        <SidebarMenuButton
-                                            isActive={selectedNoteId === note.id}
-                                            onClick={() => onSelectNote(note)}
-                                            className="transition-colors"
-                                        >
-                                            <FileText className="mr-2 h-4 w-4 opacity-70" />
-                                            <span className="truncate">{note.title || 'Untitled note'}</span>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
-                        )}
-                    </SidebarGroupContent>
-                </SidebarGroup> */}
-
                 <SidebarGroup>
                     <div className="flex items-center justify-between px-2 mb-2">
                         <SidebarGroupLabel>Other</SidebarGroupLabel>
@@ -110,6 +95,6 @@ export function AppSidebar({ onSelectNote, selectedNoteId }: AppSidebarProps) {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-        </Sidebar>
+        </Sidebar >
     );
 }
