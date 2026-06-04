@@ -109,6 +109,7 @@ export const notesApi =
                 providesTags: ["Notes"],
             }),
 
+            // fetch trash notes
             fetchTrashNotes: builder.query<
                 ApiResponse<Note[]>,
                 void
@@ -121,6 +122,7 @@ export const notesApi =
                 providesTags: ["Notes"],
             }),
 
+            // delete forever
             deleteForever: builder.mutation<
                 ApiResponse<Note>,
                 number
@@ -133,6 +135,7 @@ export const notesApi =
                 invalidatesTags: ["Notes"],
             }),
 
+            // restore note
             restore: builder.mutation<
                 ApiResponse<Note>,
                 number

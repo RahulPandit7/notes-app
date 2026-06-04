@@ -1,11 +1,10 @@
 import { useDeleteNoteMutation, useGetNotesQuery, useToggleFavoriteMutation, useTogglePinnedMutation } from "../store/api/noteApi";
 import AddNoteForm from "../components/AddNoteForm";
-import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
-import { Pin, Plus, Star, Trash } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Note } from "@/types/note";
-import SafeHtml from "@/components/SafeHtml";
 import { useOutletContext } from "react-router-dom";
+import { NoteCard } from "@/components/NoteCard";
 
 export default function AllNotePage() {
     const { showAddForm, setShowAddForm, editingNote, setEditingNote } = useOutletContext<{
@@ -86,66 +85,17 @@ export default function AllNotePage() {
                             <p className="text-muted-foreground">No notes yet. Add one!</p>
                         ) : (
                             notes.map((note) => (
-                                <Card
+                                <NoteCard
                                     key={note.id}
+                                    note={note}
                                     onClick={() => {
                                         setEditingNote({ ...note });
                                         setShowAddForm(false);
                                     }}
-                                    className="cursor-pointer hover:shadow-md hover:border-primary/40 transition-all duration-200"
-                                >
-                                    <CardHeader className="relative pr-24">
-                                        <CardTitle className="line-clamp-1 pr-4">{note.title}</CardTitle>
-                                        <div className="flex gap-1 absolute right-2 top-3">
-                                            <Button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handelPinNote(note.id);
-                                                }}
-                                                className="cursor-pointer h-6 w-6"
-                                                variant="ghost"
-                                                size="icon"
-                                            >
-                                                <Pin
-                                                    className={`h-3 w-3 transition-colors ${note.isPinned
-                                                        ? "fill-orange-500 text-orange-500"
-                                                        : "text-muted-foreground hover:text-orange-500"
-                                                        }`}
-                                                />
-                                            </Button>
-                                            <Button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handelFavoriteNote(note.id);
-                                                }}
-                                                className="cursor-pointer h-6 w-6"
-                                                variant="ghost"
-                                                size="icon"
-                                            >
-                                                <Star
-                                                    className={`h-3 w-3 transition-colors ${note.isFavorite
-                                                        ? "fill-orange-500 text-orange-500"
-                                                        : "text-muted-foreground hover:text-orange-500"
-                                                        }`}
-                                                />
-                                            </Button>
-                                            <Button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteNote(note.id);
-                                                }}
-                                                variant="ghost"
-                                                size="icon"
-                                                className="cursor-pointer h-6 w-6 hover:text-destructive"
-                                            >
-                                                <Trash className="h-2.5 w-2.5" />
-                                            </Button>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <SafeHtml html={note.content} />
-                                    </CardContent>
-                                </Card>
+                                    onPinToggle={() => handelPinNote(note.id)}
+                                    onFavoriteToggle={() => handelFavoriteNote(note.id)}
+                                    onDelete={() => handleDeleteNote(note.id)}
+                                />
                             ))
                         )}
                     </div>

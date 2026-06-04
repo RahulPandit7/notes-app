@@ -35,11 +35,11 @@ export function AppSidebar() {
     return (
         <Sidebar>
             <SidebarHeader className="p-4">
-                <div className="flex items-center gap-2 font-semibold text-lg">
-                    <Link to="/" className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground shadow-sm">
+                <div className="flex items-center gap-2 font-bold text-lg">
+                    <Link to="/" className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground shadow-sm hover:scale-105 transition-transform">
                         <FileText size={18} />
                     </Link>
-                    Notes
+                    <span className="bg-gradient-to-r from-foreground via-foreground/90 to-foreground/75 bg-clip-text text-transparent">R & R notes</span>
                 </div>
             </SidebarHeader>
             <SidebarContent>
@@ -66,13 +66,13 @@ export function AppSidebar() {
                             <SidebarMenuItem>
                                 <SidebarMenuButton>
                                     <Pin className="mr-2 h-4 w-4 opacity-70" />
-                                    <div className="flex justify-between items-center w-full">Pinned<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.pinnedCount}</span></div>
+                                    <Link to="/pinned-notes" className="flex justify-between items-center w-full">Pinned<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.pinnedCount}</span></Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton>
                                     <Star className="mr-2 h-4 w-4 opacity-70" />
-                                    <div className="flex justify-between items-center w-full">Favorites<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.favoritedCount}</span></div>
+                                    <Link to="/favorite-notes" className="flex justify-between items-center w-full">Favorites<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.favoritedCount}</span></Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
@@ -88,7 +88,7 @@ export function AppSidebar() {
                             <SidebarMenuItem>
                                 <SidebarMenuButton className="transition-colors text-muted-foreground hover:text-foreground">
                                     <Trash className="mr-2 h-4 w-4 opacity-70" />
-                                    <div className="flex justify-between items-center w-full">Trash<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.trashCount}</span></div>
+                                    <Link to="/trash-notes" className="flex justify-between items-center w-full">Trash<span className="text-xs text-foreground bg-secondary rounded-sm px-2 py-0.5">{stats?.data?.trashCount}</span></Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
