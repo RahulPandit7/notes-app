@@ -77,7 +77,7 @@ function FormField({
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="absolute top-1/2 right-2 -translate-y-1/2 h-8 w-8"
+                            className="absolute top-1/2 right-2 top-0 h-8 w-8"
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? (
