@@ -51,7 +51,7 @@ export const baseApi = createApi({
 
     baseQuery: axiosBaseQuery(),
 
-    tagTypes: ["Notes"],
+    tagTypes: ["Notes", "Auth"],
 
     endpoints: () => ({}),
 });

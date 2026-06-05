@@ -1,4 +1,5 @@
 const NOTE_BASE = 'notes'
+const AUTH_BASE = 'auth'
 
 export default {
     note: {
@@ -12,5 +13,11 @@ export default {
         trash: `${NOTE_BASE}/trash`,
         deleteForever: (id: number) => `${NOTE_BASE}/${id}/permanent`,
         restore: (id: number) => `${NOTE_BASE}/${id}/restore`,
+    },
+
+
+    auth: {
+        register: `${AUTH_BASE}/register`,
+        login: `${AUTH_BASE}/login`,
     },
 }
