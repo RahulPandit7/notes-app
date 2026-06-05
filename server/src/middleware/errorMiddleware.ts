@@ -1,16 +1,24 @@
 import { Request, Response, NextFunction } from "express";
+import { AppError } from "../utils/AppError";
 import logger from "../utils/logger";
 
 export const errorMiddleware = (
-    err: any,
+    err: Error | AppError,
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
     logger.error(err.message || err);
 
+    if (err instanceof AppError) {
+        return res.status(err.statusCode).json({
+            success: false,
+            message: err.message,
+        });
+    }
+
     return res.status(500).json({
         success: false,
-        message: err.message || "Internal Server Error",
+        message: "Internal Server Error",
     });
 };
