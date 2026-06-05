@@ -11,6 +11,7 @@ import {
 } from "@/store/api/authApi";
 
 import { setCredentials } from "@/store/slices/authSlice";
+import { useNavigate } from "react-router-dom";
 
 type AuthMode = "login" | "signup";
 
@@ -22,6 +23,7 @@ interface AuthFormValues {
 
 export const AuthForm = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [authMode, setAuthMode] =
         useState<AuthMode>("login");
@@ -81,6 +83,8 @@ export const AuthForm = () => {
             );
 
             reset();
+            navigate("/app", { replace: true });
+
         } catch (error: any) {
             setServerError(
                 error?.data?.message ||
@@ -112,8 +116,8 @@ export const AuthForm = () => {
                         setAuthMode("login")
                     }
                     className={`flex-1 py-2 ${authMode === "login"
-                            ? "bg-primary text-primary-foreground"
-                            : ""
+                        ? "bg-primary text-primary-foreground"
+                        : ""
                         }`}
                 >
                     Login
@@ -125,8 +129,8 @@ export const AuthForm = () => {
                         setAuthMode("signup")
                     }
                     className={`flex-1 py-2 ${authMode === "signup"
-                            ? "bg-primary text-primary-foreground"
-                            : ""
+                        ? "bg-primary text-primary-foreground"
+                        : ""
                         }`}
                 >
                     Sign Up
@@ -150,7 +154,7 @@ export const AuthForm = () => {
                         name="email"
                         label="Email"
                         type="email"
-                        placeholder="john@example.com"
+                        placeholder="examle@gmail.com"
                     />
 
                     <FormField
