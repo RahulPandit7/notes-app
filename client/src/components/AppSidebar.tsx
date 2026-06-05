@@ -39,7 +39,7 @@ export function AppSidebar() {
                     <Link to="/" className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground shadow-sm hover:scale-105 transition-transform">
                         <FileText size={18} />
                     </Link>
-                    <span className="bg-gradient-to-r from-foreground via-foreground/90 to-foreground/75 bg-clip-text text-transparent">R & R notes</span>
+                    <Link to="/" className="bg-gradient-to-r from-foreground via-foreground/90 to-foreground/75 bg-clip-text text-transparent">R & R notes</Link>
                 </div>
             </SidebarHeader>
             <SidebarContent>

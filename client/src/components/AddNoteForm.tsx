@@ -8,6 +8,7 @@ import type { Note } from "@/types/note";
 import { noteSchema, type NoteFormType } from "@/validators/note";
 import { closeNoteForm } from "@/store/slices/uiSlice";
 import { useDispatch } from "react-redux";
+import generateTitle from "@/helper/generateTitle ";
 
 interface AddNoteFormProps {
     editingNote?: Note | null;
@@ -45,18 +46,33 @@ export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormPro
 
     const onSubmit = async (data: NoteFormType) => {
         try {
+            const payload = {
+                title: generateTitle(data.title, data.content),
+                content: data.content || "",
+            };
+
             if (editingNote) {
-                await updateNote({ id: editingNote.id, data }).unwrap();
-                if (onClearEdit) onClearEdit();
+                await updateNote({
+                    id: editingNote.id,
+                    data: payload,
+                }).unwrap();
+
+                onClearEdit?.();
             } else {
-                await createNote(data).unwrap();
-                if (onClearEdit) onClearEdit();
+                await createNote(payload).unwrap();
+
+                onClearEdit?.();
             }
-            methods.reset({ title: "", content: "" });
+
+            methods.reset({
+                title: "",
+                content: "",
+            });
+
+            dispatch(closeNoteForm());
         } catch (error) {
             console.error("Failed to save note:", error);
         }
-        dispatch(closeNoteForm());
     };
 
     return (
