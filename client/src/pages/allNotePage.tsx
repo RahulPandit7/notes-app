@@ -82,7 +82,7 @@ export default function AllNotePage() {
                     </div>
                     <div className={`space-y-4 grid grid-cols-1 ${showAddForm || editingNote ? "md:grid-cols-1 xl:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"} gap-4`}>
                         {notes.length === 0 ? (
-                            <p className="text-muted-foreground">No notes yet. Add one!</p>
+                            <p className="text-muted-foreground col-span-full flex justify-center items-center py-12">No notes yet. Add one!</p>
                         ) : (
                             notes.map((note) => (
                                 <NoteCard
