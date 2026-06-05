@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Pin, Star, Trash, RotateCcw, Trash2 } from "lucide-react";
 import SafeHtml from "@/components/SafeHtml";
+import { AleartDialog } from "./AleartDialog";
 
 interface NoteCardProps {
     note: Note;
@@ -33,36 +34,50 @@ export const NoteCard = ({
         >
             <CardHeader className="relative pr-24 pb-2">
                 <CardTitle className="line-clamp-1 pr-4 text-base font-semibold">{note.title}</CardTitle>
-                <div className="flex gap-1 absolute right-2 top-0">
+                <div className="flex gap-1 absolute right-2 top-0" onClick={(e) => e.stopPropagation()}>
                     {isTrash ? (
                         <>
                             {onRestore && (
-                                <Button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onRestore(e);
-                                    }}
-                                    className="cursor-pointer h-6 w-6 text-muted-foreground hover:text-primary"
-                                    variant="ghost"
-                                    size="icon"
-                                    title="Restore note"
-                                >
-                                    <RotateCcw className="h-3.5 w-3.5" />
-                                </Button>
+                                <AleartDialog
+                                    title="Restore Note"
+                                    description="Are you sure you want to restore this note?"
+                                    confirmText="Restore"
+                                    onConfirm={() => onRestore({} as React.MouseEvent)}
+                                    trigger={
+                                        <Button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                            className="cursor-pointer h-6 w-6 text-muted-foreground hover:text-primary"
+                                            variant="ghost"
+                                            size="icon"
+                                            title="Restore note"
+                                        >
+                                            <RotateCcw className="h-3.5 w-3.5" />
+                                        </Button>
+                                    }
+                                />
                             )}
                             {onDeleteForever && (
-                                <Button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onDeleteForever(e);
-                                    }}
-                                    variant="ghost"
-                                    size="icon"
-                                    className="cursor-pointer h-6 w-6 text-muted-foreground hover:text-destructive"
-                                    title="Delete permanently"
-                                >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
+                                <AleartDialog
+                                    title="Delete Note"
+                                    description="Are you sure you want to delete this note permanently?"
+                                    confirmText="Delete"
+                                    onConfirm={() => onDeleteForever({} as React.MouseEvent)}
+                                    trigger={
+                                        <Button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                            variant="ghost"
+                                            size="icon"
+                                            className="cursor-pointer h-6 w-6 text-muted-foreground hover:text-destructive"
+                                            title="Delete permanently"
+                                        >
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                        </Button>
+                                    }
+                                />
                             )}
                         </>
                     ) : (
@@ -106,18 +121,25 @@ export const NoteCard = ({
                                 </Button>
                             )}
                             {onDelete && (
-                                <Button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onDelete(e);
-                                    }}
-                                    variant="ghost"
-                                    size="icon"
-                                    className="cursor-pointer h-6 w-6 text-muted-foreground hover:text-destructive"
-                                    title="Move to trash"
-                                >
-                                    <Trash className="h-2.5 w-2.5" />
-                                </Button>
+                                <AleartDialog
+                                    title="Move Note to Trash"
+                                    description="Are you sure you want to move this note to trash? You can restore it later from the trash."
+                                    confirmText="Move to Trash"
+                                    onConfirm={() => onDelete({} as React.MouseEvent)}
+                                    trigger={
+                                        <Button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                            variant="ghost"
+                                            size="icon"
+                                            className="cursor-pointer h-6 w-6 text-muted-foreground hover:text-destructive"
+                                            title="Move to trash"
+                                        >
+                                            <Trash className="h-2.5 w-2.5" />
+                                        </Button>
+                                    }
+                                />
                             )}
                         </>
                     )}
