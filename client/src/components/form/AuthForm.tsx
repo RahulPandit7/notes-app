@@ -14,6 +14,7 @@ import { setCredentials } from "@/store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, registerSchema } from "@/validators/authSchema";
+import toast from "react-hot-toast";
 
 type AuthMode = "login" | "signup";
 
@@ -57,26 +58,34 @@ export const AuthForm = () => {
         reset,
     } = methods;
 
-    const onSubmit = async (
-        data: AuthFormValues
-    ) => {
+    const onSubmit = async (data: AuthFormValues) => {
         try {
             setServerError("");
 
-            let response;
+            const authPromise =
+                authMode === "login"
+                    ? login({
+                        email: data.email,
+                        password: data.password,
+                    }).unwrap()
+                    : register({
+                        name: data.name || "",
+                        email: data.email,
+                        password: data.password,
+                    }).unwrap();
 
-            if (authMode === "login") {
-                response = await login({
-                    email: data.email,
-                    password: data.password,
-                }).unwrap();
-            } else {
-                response = await register({
-                    name: data.name || "",
-                    email: data.email,
-                    password: data.password,
-                }).unwrap();
-            }
+            const response = await toast.promise(authPromise, {
+                loading:
+                    authMode === "login"
+                        ? "Logging in..."
+                        : "Creating account...",
+                success:
+                    authMode === "login"
+                        ? "Login successful!"
+                        : "Account created successfully!",
+                error: (err) =>
+                    err?.data?.message || "Something went wrong",
+            });
 
             dispatch(
                 setCredentials({
@@ -94,8 +103,7 @@ export const AuthForm = () => {
 
         } catch (error: any) {
             setServerError(
-                error?.data?.message ||
-                "Something went wrong"
+                error?.data?.message || "Something went wrong"
             );
         }
     };

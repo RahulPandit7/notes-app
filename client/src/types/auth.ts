@@ -1,10 +1,7 @@
-export interface User {
+export interface AuthResponse {
     id: string;
     name: string;
     email: string;
-};
-
-export interface AuthResponse {
     token: string;
-    user: User;
 }
+

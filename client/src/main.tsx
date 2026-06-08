@@ -13,12 +13,19 @@ import ProtectedRoute from './components/ProtectedRoute.tsx'
 import LoginForm from './routes/loginForm.tsx'
 import ProtectedLayout from './layouts/ProtectedLayout.tsx'
 import Landing from './routes/landing.tsx'
+import { Toaster } from 'react-hot-toast'
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 3000,
+          }}
+        />
         <Routes>
           {/* PUBLIC */}
           <Route path="/" element={<Landing />} />
