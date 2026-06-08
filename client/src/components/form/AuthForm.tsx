@@ -12,6 +12,8 @@ import {
 
 import { setCredentials } from "@/store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, registerSchema } from "@/validators/authSchema";
 
 type AuthMode = "login" | "signup";
 
@@ -37,6 +39,11 @@ export const AuthForm = () => {
         useRegisterMutation();
 
     const methods = useForm<AuthFormValues>({
+        resolver: zodResolver(
+            authMode === "login"
+                ? loginSchema
+                : registerSchema
+        ),
         defaultValues: {
             name: "",
             email: "",
