@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 
 import {
     getAllNotes,
@@ -10,18 +10,32 @@ import {
     getNotesStatus,
     getTrashNotes,
     restoreNoteById,
-    permanentlyDeleteNoteById
+    permanentlyDeleteNoteById,
 } from "../services/noteService";
 
 import { sendSuccess } from "../utils/apiResponse";
 import logger from "../utils/logger";
+import { AppError } from "../utils/AppError";
+import { AuthRequest } from "../middleware/authMiddleware";
+
+const getUserIdOrThrow = (req: AuthRequest): number => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+        throw new AppError("User not authenticated", 401);
+    }
+
+    return userId;
+};
 
 export const fetchNotes = async (
-    req: Request,
+    req: AuthRequest,
     res: Response
 ) => {
     logger.info("Fetching all notes");
-    const notes = await getAllNotes();
+    const userId = getUserIdOrThrow(req);
+
+    const notes = await getAllNotes(userId);
 
     return sendSuccess(
         res,
@@ -31,15 +45,17 @@ export const fetchNotes = async (
 };
 
 export const addNote = async (
-    req: Request,
+    req: AuthRequest,
     res: Response
 ) => {
     logger.info("Adding a new note", { body: req.body });
     const { title, content } = req.body;
+    const userId = getUserIdOrThrow(req);
 
     const note = await createNote(
         title,
-        content
+        content,
+        userId
     );
 
     return sendSuccess(
@@ -51,14 +67,20 @@ export const addNote = async (
 };
 
 export const deleteNote = async (
-    req: Request,
+    req: AuthRequest,
     res: Response
 ) => {
     const noteId = Number(req.params.id);
-    logger.info(`Deleting note with id: ${noteId}`);
+    const userId = getUserIdOrThrow(req);
 
-    const deletedNote =
-        await deleteNoteById(noteId);
+    logger.info(
+        `Soft-deleting note ${noteId} for user ${userId}`
+    );
+
+    const deletedNote = await deleteNoteById(
+        noteId,
+        userId
+    );
 
     return sendSuccess(
         res,
@@ -68,14 +90,23 @@ export const deleteNote = async (
 };
 
 export const updateNote = async (
-    req: Request,
+    req: AuthRequest,
     res: Response
 ) => {
     const noteId = Number(req.params.id);
-    logger.info(`Updating note with id: ${noteId}`);
+    const userId = getUserIdOrThrow(req);
     const { title, content } = req.body;
 
-    const updatedNote = await updateNoteById(noteId, title, content);
+    logger.info(
+        `Updating note ${noteId} for user ${userId}`
+    );
+
+    const updatedNote = await updateNoteById(
+        noteId,
+        title,
+        content,
+        userId
+    );
 
     return sendSuccess(
         res,
@@ -84,10 +115,22 @@ export const updateNote = async (
     );
 };
 
-export const togglePinned = async (req: Request, res: Response) => {
+export const togglePinned = async (
+    req: AuthRequest,
+    res: Response
+) => {
     const noteId = Number(req.params.id);
-    logger.info(`Toggling pinned for note with id: ${noteId}`);
-    const updatedNote = await togglePinnedById(noteId);
+    const userId = getUserIdOrThrow(req);
+
+    logger.info(
+        `Toggling pinned for note ${noteId} (user ${userId})`
+    );
+
+    const updatedNote = await togglePinnedById(
+        noteId,
+        userId
+    );
+
     return sendSuccess(
         res,
         "Note pinned successfully",
@@ -95,10 +138,22 @@ export const togglePinned = async (req: Request, res: Response) => {
     );
 };
 
-export const toggleFavorite = async (req: Request, res: Response) => {
+export const toggleFavorite = async (
+    req: AuthRequest,
+    res: Response
+) => {
     const noteId = Number(req.params.id);
-    logger.info(`Toggling favorited for note with id: ${noteId}`);
-    const updatedNote = await toggleFavoriteById(noteId);
+    const userId = getUserIdOrThrow(req);
+
+    logger.info(
+        `Toggling favorite for note ${noteId} (user ${userId})`
+    );
+
+    const updatedNote = await toggleFavoriteById(
+        noteId,
+        userId
+    );
+
     return sendSuccess(
         res,
         "Note favorited successfully",
@@ -106,9 +161,15 @@ export const toggleFavorite = async (req: Request, res: Response) => {
     );
 };
 
-export const fetchNotesStatus = async (req: Request, res: Response) => {
+export const fetchNotesStatus = async (
+    req: AuthRequest,
+    res: Response
+) => {
     logger.info("Fetching notes status");
-    const notesStatus = await getNotesStatus();
+    const userId = getUserIdOrThrow(req);
+
+    const notesStatus = await getNotesStatus(userId);
+
     return sendSuccess(
         res,
         "Notes status fetched successfully",
@@ -117,12 +178,13 @@ export const fetchNotesStatus = async (req: Request, res: Response) => {
 };
 
 export const fetchTrashNotes = async (
-    req: Request,
+    req: AuthRequest,
     res: Response
 ) => {
     logger.info("Fetching trash notes");
+    const userId = getUserIdOrThrow(req);
 
-    const notes = await getTrashNotes();
+    const notes = await getTrashNotes(userId);
 
     return sendSuccess(
         res,
@@ -132,17 +194,20 @@ export const fetchTrashNotes = async (
 };
 
 export const restoreNote = async (
-    req: Request,
+    req: AuthRequest,
     res: Response
 ) => {
     const noteId = Number(req.params.id);
+    const userId = getUserIdOrThrow(req);
 
     logger.info(
-        `Restoring note with id: ${noteId}`
+        `Restoring note ${noteId} for user ${userId}`
     );
 
-    const restoredNote =
-        await restoreNoteById(noteId);
+    const restoredNote = await restoreNoteById(
+        noteId,
+        userId
+    );
 
     return sendSuccess(
         res,
@@ -152,17 +217,18 @@ export const restoreNote = async (
 };
 
 export const permanentlyDeleteNote = async (
-    req: Request,
+    req: AuthRequest,
     res: Response
 ) => {
     const noteId = Number(req.params.id);
+    const userId = getUserIdOrThrow(req);
 
     logger.info(
-        `Permanently deleting note with id: ${noteId}`
+        `Permanently deleting note ${noteId} for user ${userId}`
     );
 
     const deletedNote =
-        await permanentlyDeleteNoteById(noteId);
+        await permanentlyDeleteNoteById(noteId, userId);
 
     return sendSuccess(
         res,
