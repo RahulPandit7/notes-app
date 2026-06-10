@@ -1,10 +1,23 @@
 import prisma from "../config/prisma";
 import { AppError } from "../utils/AppError";
 
-export const getAllNotes = async (userId: number) => {
+export const getOwnNotes = async (userId: number) => {
     return prisma.note.findMany({
         where: {
             userId,
+            isDeleted: false,
+        },
+        orderBy: [
+            { isPinned: "desc" },
+            { isFavorite: "desc" },
+            { createdAt: "desc" },
+        ],
+    });
+};
+
+export const getAllNotes = async () => {
+    return prisma.note.findMany({
+        where: {
             isDeleted: false,
         },
         orderBy: [

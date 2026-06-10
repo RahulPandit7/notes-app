@@ -4,6 +4,7 @@ const AUTH_BASE = 'auth'
 export default {
     note: {
         create: `${NOTE_BASE}`,
+        own: `${NOTE_BASE}/own`,
         getAll: `${NOTE_BASE}`,
         update: `${NOTE_BASE}`,
         delete: `${NOTE_BASE}`,

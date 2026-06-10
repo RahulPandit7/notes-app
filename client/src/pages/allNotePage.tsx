@@ -1,4 +1,4 @@
-import { useDeleteNoteMutation, useGetNotesQuery, useToggleFavoriteMutation, useTogglePinnedMutation } from "../store/api/noteApi";
+import { useDeleteNoteMutation, useGetOwnNotesQuery, useToggleFavoriteMutation, useTogglePinnedMutation } from "../store/api/noteApi";
 import AddNoteForm from "../components/AddNoteForm";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ export default function AllNotePage() {
         setEditingNote: React.Dispatch<React.SetStateAction<Note | null>>;
     }>();
 
-    const { data, isLoading, error } = useGetNotesQuery();
+    const { data, isLoading, error } = useGetOwnNotesQuery();
     const [deleteNoteById] = useDeleteNoteMutation();
     const [pinNoteToggleById] = useTogglePinnedMutation();
     const [favoriteNoteToggleById] = useToggleFavoriteMutation();

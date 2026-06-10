@@ -11,6 +11,7 @@ import {
     fetchTrashNotes,
     restoreNote,
     permanentlyDeleteNote,
+    ownNotes,
 } from "../controllers/noteController";
 
 import { asyncHandler } from "../middleware/asyncHandler";
@@ -25,6 +26,12 @@ const router = Router();
 
 // All note routes require a valid JWT
 router.use(authenticate);
+
+router.get(
+    "/own",
+    authenticate,
+    asyncHandler(ownNotes)
+);
 
 router.get(
     "/",

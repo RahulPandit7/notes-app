@@ -11,6 +11,7 @@ import {
     getTrashNotes,
     restoreNoteById,
     permanentlyDeleteNoteById,
+    getOwnNotes,
 } from "../services/noteService";
 
 import { sendSuccess } from "../utils/apiResponse";
@@ -28,14 +29,29 @@ const getUserIdOrThrow = (req: AuthRequest): number => {
     return userId;
 };
 
-export const fetchNotes = async (
+export const ownNotes = async (
     req: AuthRequest,
     res: Response
 ) => {
-    logger.info("Fetching all notes");
+    logger.info("Fetching own notes");
     const userId = getUserIdOrThrow(req);
 
-    const notes = await getAllNotes(userId);
+    const notes = await getOwnNotes(userId);
+
+    return sendSuccess(
+        res,
+        "Own notes fetched successfully",
+        notes
+    );
+}
+
+export const fetchNotes = async (
+    req: Request,
+    res: Response
+) => {
+    logger.info("Fetching all notes");
+
+    const notes = await getAllNotes();
 
     return sendSuccess(
         res,

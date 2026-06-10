@@ -12,6 +12,19 @@ type CreateNoteRequest = {
 export const notesApi =
     baseApi.injectEndpoints({
         endpoints: (builder) => ({
+            // GET OWN NOTES 
+            getOwnNotes: builder.query<
+                ApiResponse<Note[]>,
+                void
+            >({
+                query: () => ({
+                    url: `${apiRoutes.note.own}`,
+                    method: "GET",
+                }),
+
+                providesTags: ["Notes"],
+            }),
+
             // GET ALL NOTES
             getNotes: builder.query<
                 ApiResponse<Note[]>,
@@ -153,6 +166,7 @@ export const notesApi =
 
 export const {
     useGetNotesQuery,
+    useGetOwnNotesQuery,
     useCreateNoteMutation,
     useDeleteNoteMutation,
     useUpdateNoteMutation,

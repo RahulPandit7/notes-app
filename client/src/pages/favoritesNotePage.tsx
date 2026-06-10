@@ -1,4 +1,4 @@
-import { useDeleteNoteMutation, useGetNotesQuery, useToggleFavoriteMutation } from "@/store/api/noteApi";
+import { useDeleteNoteMutation, useGetOwnNotesQuery, useToggleFavoriteMutation } from "@/store/api/noteApi";
 import { NoteCard } from "@/components/NoteCard";
 import AddNoteForm from "@/components/AddNoteForm";
 import type { Note } from "@/types/note";
@@ -12,7 +12,7 @@ export default function FavoriteNotesPage() {
         setEditingNote: React.Dispatch<React.SetStateAction<Note | null>>;
     }>();
 
-    const { data, isLoading, error } = useGetNotesQuery();
+    const { data, isLoading, error } = useGetOwnNotesQuery();
     const [deleteNoteById] = useDeleteNoteMutation();
     // const [pinNoteToggleById] = useTogglePinnedMutation();
     const [favoriteNoteToggleById] = useToggleFavoriteMutation();
