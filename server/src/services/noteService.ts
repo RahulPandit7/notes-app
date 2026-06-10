@@ -1,33 +1,57 @@
 import prisma from "../config/prisma";
+import { AppError } from "../utils/AppError";
 
-export const getAllNotes = async () => {
+export const getAllNotes = async (userId: number) => {
     return prisma.note.findMany({
         where: {
+            userId,
             isDeleted: false,
         },
         orderBy: [
             { isPinned: "desc" },
             { isFavorite: "desc" },
-            { createdAt: "desc" }
+            { createdAt: "desc" },
         ],
     });
 };
 
 export const createNote = async (
     title: string,
-    content: string
+    content: string,
+    userId: number
 ) => {
     return prisma.note.create({
         data: {
             title,
             content,
+            userId,
         },
     });
 };
 
+const getOwnedNoteOrThrow = async (id: number, userId: number) => {
+    const note = await prisma.note.findUnique({
+        where: { id },
+    });
+
+    if (!note) {
+        throw new AppError("Note not found", 404);
+    }
+
+    if (note.userId !== userId) {
+
+        throw new AppError("Note not found", 404);
+    }
+
+    return note;
+};
+
 export const deleteNoteById = async (
-    id: number
+    id: number,
+    userId: number
 ) => {
+    await getOwnedNoteOrThrow(id, userId);
+
     return prisma.note.update({
         where: {
             id,
@@ -42,8 +66,11 @@ export const deleteNoteById = async (
 export const updateNoteById = async (
     id: number,
     title: string,
-    content: string
+    content: string,
+    userId: number
 ) => {
+    await getOwnedNoteOrThrow(id, userId);
+
     return prisma.note.update({
         where: {
             id,
@@ -55,14 +82,11 @@ export const updateNoteById = async (
     });
 };
 
-export const togglePinnedById = async (id: number) => {
-    const note = await prisma.note.findUnique({
-        where: { id },
-    });
-
-    if (!note) {
-        throw new Error("Note not found");
-    }
+export const togglePinnedById = async (
+    id: number,
+    userId: number
+) => {
+    const note = await getOwnedNoteOrThrow(id, userId);
 
     return prisma.note.update({
         where: { id },
@@ -72,14 +96,11 @@ export const togglePinnedById = async (id: number) => {
     });
 };
 
-export const toggleFavoriteById = async (id: number) => {
-    const note = await prisma.note.findUnique({
-        where: { id },
-    });
-
-    if (!note) {
-        throw new Error("Note not found");
-    }
+export const toggleFavoriteById = async (
+    id: number,
+    userId: number
+) => {
+    const note = await getOwnedNoteOrThrow(id, userId);
 
     return prisma.note.update({
         where: { id },
@@ -89,32 +110,37 @@ export const toggleFavoriteById = async (id: number) => {
     });
 };
 
+export const getNotesStatus = async (userId: number) => {
+    const [totalCount, pinnedCount, favoritedCount, trashCount] =
+        await Promise.all([
+            prisma.note.count({
+                where: {
+                    userId,
+                    isDeleted: false,
+                },
+            }),
+            prisma.note.count({
+                where: {
+                    userId,
+                    isPinned: true,
+                    isDeleted: false,
+                },
+            }),
+            prisma.note.count({
+                where: {
+                    userId,
+                    isFavorite: true,
+                    isDeleted: false,
+                },
+            }),
+            prisma.note.count({
+                where: {
+                    userId,
+                    isDeleted: true,
+                },
+            }),
+        ]);
 
-export const getNotesStatus = async () => {
-    const [totalCount, pinnedCount, favoritedCount, trashCount] = await Promise.all([
-        prisma.note.count({
-            where: {
-                isDeleted: false,
-            },
-        }),
-        prisma.note.count({
-            where: {
-                isPinned: true,
-                isDeleted: false,
-            },
-        }),
-        prisma.note.count({
-            where: {
-                isFavorite: true,
-                isDeleted: false,
-            },
-        }),
-        prisma.note.count({
-            where: {
-                isDeleted: true,
-            },
-        }),
-    ]);
     return {
         totalCount,
         pinnedCount,
@@ -123,9 +149,10 @@ export const getNotesStatus = async () => {
     };
 };
 
-export const getTrashNotes = async () => {
+export const getTrashNotes = async (userId: number) => {
     return prisma.note.findMany({
         where: {
+            userId,
             isDeleted: true,
         },
         orderBy: {
@@ -135,8 +162,11 @@ export const getTrashNotes = async () => {
 };
 
 export const restoreNoteById = async (
-    id: number
+    id: number,
+    userId: number
 ) => {
+    await getOwnedNoteOrThrow(id, userId);
+
     return prisma.note.update({
         where: {
             id,
@@ -149,8 +179,11 @@ export const restoreNoteById = async (
 };
 
 export const permanentlyDeleteNoteById = async (
-    id: number
+    id: number,
+    userId: number
 ) => {
+    await getOwnedNoteOrThrow(id, userId);
+
     return prisma.note.delete({
         where: {
             id,

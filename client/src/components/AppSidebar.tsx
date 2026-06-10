@@ -25,7 +25,7 @@ export function AppSidebar() {
     const { data: stats } = useFetchNoteStatsQuery();
 
     const handlePlusClick = () => {
-        navigate("/");
+        navigate("/app");
         if (isFormOpen) {
             dispatch(toggleNoteForm());
         } else {
