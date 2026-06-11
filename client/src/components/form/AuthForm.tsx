@@ -59,7 +59,7 @@ export const AuthForm = () => {
 
             const response = await toast.promise(authPromise, {
                 loading: authMode === "login" ? "Logging in…" : "Creating account…",
-                success: authMode === "login" ? "Welcome back!" : "Account created!",
+                success: authMode === "login" ? "Login successfully!" : "Register successfully!",
                 error: (err) => err?.data?.message || "Something went wrong",
             });
 

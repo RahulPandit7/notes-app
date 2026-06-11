@@ -30,6 +30,7 @@ import { useFetchNoteStatsQuery } from "../store/api/noteApi";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { AleartDialog } from "./AleartDialog";
 
 
 export function AppSidebar() {
@@ -257,19 +258,26 @@ export function AppSidebar() {
                                 </DropdownMenuItem>
 
                                 <DropdownMenuSeparator />
+                                <AleartDialog
+                                    title="Logout!"
+                                    description="Are you sure you want to log out of your account? You will need to sign in again to access your notes."
+                                    onConfirm={handleLogout}
+                                    trigger={
+                                        <DropdownMenuItem
+                                            className="text-red-500 focus:text-red-500"
+                                            onSelect={(e) => e.preventDefault()}
+                                        >
+                                            <LogOut className="mr-2 h-4 w-4" />
+                                            Logout
+                                        </DropdownMenuItem>
+                                    }
+                                />
 
-                                <DropdownMenuItem
-                                    className="text-red-500 focus:text-red-500"
-                                    onClick={handleLogout}
-                                >
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    Logout
-                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
-        </Sidebar>
+        </Sidebar >
     );
 }
