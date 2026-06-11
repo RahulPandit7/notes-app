@@ -1,9 +1,26 @@
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import type { RootState } from "@/store/store";
+
 export default function LandingPage() {
+    const token = useSelector(
+        (state: RootState) => state.auth.token
+    );
+
+    // If user is already logged in, send them straight to the app
+    if (token) {
+        return <Navigate to="/app" replace />;
+    }
+
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
             {/* NAV */}
             <header className="w-full flex items-center justify-between px-6 py-4 border-b border-border">
-                <h1 className="text-xl font-bold"><a href="/" className="hover:cursor-pointer">R & R Notes</a></h1>
+                <h1 className="text-xl font-bold">
+                    <a href="/" className="hover:cursor-pointer">
+                        R & R Notes
+                    </a>
+                </h1>
 
                 <div className="space-x-3">
                     <a
@@ -42,7 +59,7 @@ export default function LandingPage() {
                     </a>
 
                     <a
-                        href=""
+                        href="#features"
                         className="px-6 py-3 rounded-lg border hover:bg-muted"
                     >
                         Learn More
