@@ -6,22 +6,20 @@ import AddNoteForm from "@/components/AddNoteForm";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-import { openNoteForm, closeNoteForm } from "@/store/slices/uiSlice";
-import { logout } from "@/store/slices/authSlice";
+import { closeNoteForm, openNoteForm } from "@/store/slices/uiSlice";
 
 import type { RootState } from "@/store/store";
 
 import { useFetchNoteStatsQuery } from "@/store/api/noteApi";
 
+import { AuthForm } from "@/components/form/AuthForm";
 import {
-    Plus,
     FileText,
     Pin,
+    Plus,
     Star,
-    Trash,
-    LogOut,
+    Trash
 } from "lucide-react";
-import { AuthForm } from "@/components/form/AuthForm";
 
 export default function HeroPage() {
     const dispatch = useDispatch();
@@ -38,10 +36,10 @@ export default function HeroPage() {
 
     const isLoggedIn = !!user;
 
-    const handleLogout = () => {
-        dispatch(logout());
-        dispatch(closeNoteForm());
-    };
+    // const handleLogout = () => {
+    //     dispatch(logout());
+    //     dispatch(closeNoteForm());
+    // };
 
     if (!isLoggedIn) {
         return (
@@ -65,13 +63,13 @@ export default function HeroPage() {
                     </p>
                 </div>
 
-                <Button
+                {/* <Button
                     variant="outline"
                     onClick={handleLogout}
                 >
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
-                </Button>
+                </Button> */}
             </Card>
 
             {/* Note Form */}
@@ -100,7 +98,7 @@ export default function HeroPage() {
 
                     {/* Stats */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <Link to="/notes">
+                        <Link to="/app/notes">
                             <Card className="p-5 hover:shadow-md transition">
                                 <FileText className="mb-3" />
                                 <h3 className="text-2xl font-bold">
@@ -112,7 +110,7 @@ export default function HeroPage() {
                             </Card>
                         </Link>
 
-                        <Link to="/pinned-notes">
+                        <Link to="/app/pinned-notes">
                             <Card className="p-5 hover:shadow-md transition">
                                 <Pin className="mb-3" />
                                 <h3 className="text-2xl font-bold">
@@ -124,7 +122,7 @@ export default function HeroPage() {
                             </Card>
                         </Link>
 
-                        <Link to="/favorite-notes">
+                        <Link to="/app/favorite-notes">
                             <Card className="p-5 hover:shadow-md transition">
                                 <Star className="mb-3" />
                                 <h3 className="text-2xl font-bold">
@@ -136,7 +134,7 @@ export default function HeroPage() {
                             </Card>
                         </Link>
 
-                        <Link to="/trash-notes">
+                        <Link to="/app/trash-notes">
                             <Card className="p-5 hover:shadow-md transition">
                                 <Trash className="mb-3" />
                                 <h3 className="text-2xl font-bold">

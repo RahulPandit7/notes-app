@@ -1,7 +1,19 @@
 import { AuthForm } from "@/components/form/AuthForm";
 import { Button } from "@/components/ui/button";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import type { RootState } from "@/store/store";
 
 export default function LoginFormPage() {
+    const token = useSelector(
+        (state: RootState) => state.auth.token
+    );
+
+
+    if (token) {
+        return <Navigate to="/app" replace />;
+    }
+
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
             {/* NAV */}
