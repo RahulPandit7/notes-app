@@ -29,7 +29,7 @@ const TrashNotePage = () => {
     const notes = trashNotes?.data ?? [];
 
     return (
-        <div className="container mx-auto p-8">
+        <div className="container mx-auto py-8 ">
             <h2 className="text-2xl font-semibold mb-6">Trash Notes</h2>
             {notes.length === 0 ? (
                 <p className="text-muted-foreground text-center py-12">No notes in Trash.</p>

@@ -51,7 +51,7 @@ export default function PinnedNotePage() {
     const pinnedNotes = notes.filter((note) => note.isPinned);
 
     return (
-        <div className="container mx-auto p-8">
+        <div className="container mx-auto py-8 ">
             <div className={`grid gap-8 items-start ${showAddForm || editingNote ? "grid-cols-1 lg:grid-cols-1" : "grid-cols-1"}`}>
                 {(showAddForm || editingNote) && (
                     <div className="border border-border/40 p-5 rounded-xl bg-card shadow-sm">
