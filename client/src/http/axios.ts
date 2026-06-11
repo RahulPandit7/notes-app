@@ -33,7 +33,12 @@ axiosInstance.interceptors.response.use(
 
             localStorage.removeItem("access_token");
             localStorage.removeItem("user");
-            window.location.href = "/";
+
+            if (typeof window !== "undefined") {
+                window.dispatchEvent(
+                    new CustomEvent("auth:unauthorized")
+                );
+            }
         }
 
         if (error.response?.status === 500) {

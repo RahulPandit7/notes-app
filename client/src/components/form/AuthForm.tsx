@@ -3,13 +3,10 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 
 import FormField from "./FormField";
-import { Button } from "../ui/button";
-
 import {
     useLoginMutation,
     useRegisterMutation,
 } from "@/store/api/authApi";
-
 import { setCredentials } from "@/store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,28 +25,17 @@ export const AuthForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [authMode, setAuthMode] =
-        useState<AuthMode>("login");
-
-    const [serverError, setServerError] =
-        useState("");
+    const [authMode, setAuthMode] = useState<AuthMode>("login");
+    const [serverError, setServerError] = useState("");
 
     const [login] = useLoginMutation();
-
-    const [register] =
-        useRegisterMutation();
+    const [register] = useRegisterMutation();
 
     const methods = useForm<AuthFormValues>({
         resolver: zodResolver(
-            authMode === "login"
-                ? loginSchema
-                : registerSchema
+            authMode === "login" ? loginSchema : registerSchema
         ),
-        defaultValues: {
-            name: "",
-            email: "",
-            password: "",
-        },
+        defaultValues: { name: "", email: "", password: "" },
     });
 
     const {
@@ -64,10 +50,7 @@ export const AuthForm = () => {
 
             const authPromise =
                 authMode === "login"
-                    ? login({
-                        email: data.email,
-                        password: data.password,
-                    }).unwrap()
+                    ? login({ email: data.email, password: data.password }).unwrap()
                     : register({
                         name: data.name || "",
                         email: data.email,
@@ -75,16 +58,9 @@ export const AuthForm = () => {
                     }).unwrap();
 
             const response = await toast.promise(authPromise, {
-                loading:
-                    authMode === "login"
-                        ? "Logging in..."
-                        : "Creating account...",
-                success:
-                    authMode === "login"
-                        ? "Login successful!"
-                        : "Account created successfully!",
-                error: (err) =>
-                    err?.data?.message || "Something went wrong",
+                loading: authMode === "login" ? "Logging in…" : "Creating account…",
+                success: authMode === "login" ? "Welcome back!" : "Account created!",
+                error: (err) => err?.data?.message || "Something went wrong",
             });
 
             dispatch(
@@ -100,58 +76,35 @@ export const AuthForm = () => {
 
             reset();
             navigate("/app", { replace: true });
-
         } catch (error: any) {
-            setServerError(
-                error?.data?.message || "Something went wrong"
-            );
+            setServerError(error?.data?.message || "Something went wrong");
         }
     };
 
     return (
-        <div className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-sm">
-            <div className="space-y-2 mb-6">
-                <h2 className="text-2xl font-bold">
-                    {authMode === "login"
-                        ? "Login"
-                        : "Create Account"}
-                </h2>
-
-                <p className="text-sm text-muted-foreground">
-                    {authMode === "login"
-                        ? "Sign in to continue"
-                        : "Create your account"}
-                </p>
+        <div className="w-full">
+            {/* ── Mode toggle ── */}
+            <div className="flex mb-6 rounded-xl bg-[#0D0F14] border border-white/5 p-1 gap-1">
+                {(["login", "signup"] as AuthMode[]).map((mode) => (
+                    <button
+                        key={mode}
+                        type="button"
+                        onClick={() => {
+                            setAuthMode(mode);
+                            setServerError("");
+                            reset();
+                        }}
+                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${authMode === mode
+                            ? "bg-[#E8A838] text-[#0D0F14] shadow-sm"
+                            : "text-[#6B7280] hover:text-[#F2F0EB]"
+                            }`}
+                    >
+                        {mode === "login" ? "Log in" : "Sign up"}
+                    </button>
+                ))}
             </div>
 
-            <div className="flex mb-6 rounded-lg border overflow-hidden">
-                <button
-                    type="button"
-                    onClick={() =>
-                        setAuthMode("login")
-                    }
-                    className={`flex-1 py-2 ${authMode === "login"
-                        ? "bg-primary text-primary-foreground"
-                        : ""
-                        }`}
-                >
-                    Login
-                </button>
-
-                <button
-                    type="button"
-                    onClick={() =>
-                        setAuthMode("signup")
-                    }
-                    className={`flex-1 py-2 ${authMode === "signup"
-                        ? "bg-primary text-primary-foreground"
-                        : ""
-                        }`}
-                >
-                    Sign Up
-                </button>
-            </div>
-
+            {/* ── Form ── */}
             <FormProvider {...methods}>
                 <form
                     onSubmit={handleSubmit(onSubmit)}
@@ -169,33 +122,36 @@ export const AuthForm = () => {
                         name="email"
                         label="Email"
                         type="email"
-                        placeholder="examle@gmail.com"
+                        placeholder="you@example.com"
                     />
 
                     <FormField
                         name="password"
                         label="Password"
                         password
-                        placeholder="Enter password"
+                        placeholder="Enter your password"
                     />
 
+                    {/* Server error */}
                     {serverError && (
-                        <p className="text-sm text-red-500">
-                            {serverError}
-                        </p>
+                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-500/8 border border-red-500/15">
+                            <span className="text-red-400 text-xs mt-0.5">⚠</span>
+                            <p className="text-xs text-red-400">{serverError}</p>
+                        </div>
                     )}
 
-                    <Button
+                    {/* Submit */}
+                    <button
                         type="submit"
-                        className="w-full"
                         disabled={isSubmitting}
+                        className="w-full mt-2 py-2.5 rounded-xl bg-[#E8A838] text-[#0D0F14] text-sm font-semibold hover:bg-[#F0B845] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting
-                            ? "Please wait..."
+                            ? "Please wait…"
                             : authMode === "login"
-                                ? "Login"
-                                : "Create Account"}
-                    </Button>
+                                ? "Log in"
+                                : "Create account"}
+                    </button>
                 </form>
             </FormProvider>
         </div>

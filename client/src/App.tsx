@@ -1,14 +1,31 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AppSidebar } from './components/AppSidebar';
-import { Outlet } from 'react-router-dom';
-import { useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { logout } from '@/store/slices/authSlice';
 import type { Note } from "@/types/note";
 import './App.css';
 
 function App() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      dispatch(logout());
+      navigate('/login', { replace: true });
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+    };
+  }, [dispatch, navigate]);
 
   return (
     <TooltipProvider delayDuration={0}>

@@ -96,12 +96,14 @@ export function AppSidebar() {
                     >
                         <FileText size={18} />
                     </Link>
+                    <Link to="/app">
+                        <span
+                            className="bg-gradient-to-r from-foreground via-foreground/90 to-foreground/75 bg-clip-text text-transparent group-data-[collapsible=icon]:hidden"
+                        >
+                            R & R notes
+                        </span>
+                    </Link>
 
-                    <span
-                        className="bg-gradient-to-r from-foreground via-foreground/90 to-foreground/75 bg-clip-text text-transparent group-data-[collapsible=icon]:hidden"
-                    >
-                        R & R notes
-                    </span>
                 </div>
             </SidebarHeader>
 
