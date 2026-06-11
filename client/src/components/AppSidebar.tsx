@@ -15,26 +15,32 @@ import {
     SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
+    SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import { logout } from "@/store/slices/authSlice";
 import { openNoteForm, toggleNoteForm } from "@/store/slices/uiSlice";
 import type { RootState } from "@/store/store";
 import { ChevronUp, FileText, LogOut, Mail, Pin, Plus, Star, Trash } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useFetchNoteStatsQuery } from "../store/api/noteApi";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 
 export function AppSidebar() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
     const isFormOpen = useSelector((state: RootState) => state.ui.isNoteFormOpen);
     const { data: stats } = useFetchNoteStatsQuery();
     const user = useSelector((state: RootState) => state.auth.user);
+    const { state: sidebarState } = useSidebar();
+    const expanded = sidebarState === "expanded";
 
     const handlePlusClick = () => {
         navigate("/app");
@@ -81,9 +87,9 @@ export function AppSidebar() {
     ];
 
     return (
-        <Sidebar>
-            <SidebarHeader className="p-4">
-                <div className="flex items-center gap-2 font-bold text-lg">
+        <Sidebar collapsible="icon">
+            <SidebarHeader className="p-4 transition-[padding] duration-200 ease-linear group-data-[collapsible=icon]:p-2">
+                <div className="flex items-center gap-2 font-bold text-lg group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 transition-all duration-200 ease-linear">
                     <Link
                         to="/app"
                         className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground shadow-sm hover:scale-105 transition-transform shrink-0"
@@ -91,12 +97,11 @@ export function AppSidebar() {
                         <FileText size={18} />
                     </Link>
 
-                    <Link
-                        to="/app"
+                    <span
                         className="bg-gradient-to-r from-foreground via-foreground/90 to-foreground/75 bg-clip-text text-transparent group-data-[collapsible=icon]:hidden"
                     >
                         R & R notes
-                    </Link>
+                    </span>
                 </div>
             </SidebarHeader>
 
@@ -107,39 +112,54 @@ export function AppSidebar() {
                             YOUR NOTES
                         </SidebarGroupLabel>
 
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={handlePlusClick}
-                        >
-                            <Plus size={16} />
-                        </Button>
+                        {expanded && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={handlePlusClick}
+                                aria-label="Create new note"
+                                asChild
+                            >
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Plus size={16} />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Add New Note</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </Button>
+                        )}
                     </div>
 
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {noteMenus.map((item) => {
                                 const Icon = item.icon;
+                                const isActive =
+                                    location.pathname === item.path ||
+                                    (item.path === "/app/notes" && location.pathname === "/app");
 
                                 return (
                                     <SidebarMenuItem key={item.path}>
-                                        <SidebarMenuButton asChild >
-                                            <Link
-                                                to={item.path}
-                                                className="flex items-center w-full"
-                                            >
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={isActive}
+                                            tooltip={item.title}
+                                        >
+                                            <NavLink to={item.path}>
                                                 <Icon className="h-4 w-4 shrink-0" />
-
-                                                <div className="ml-2 flex items-center justify-between w-full group-data-[collapsible=icon]:hidden">
-                                                    <span>{item.title}</span>
-
-                                                    <span className="text-xs bg-secondary rounded-sm px-2 py-0.5">
-                                                        {item.count ?? 0}
-                                                    </span>
-                                                </div>
-                                            </Link>
+                                                <span className="transition-all duration-200 ease-linear group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:overflow-hidden">
+                                                    {item.title}
+                                                </span>
+                                            </NavLink>
                                         </SidebarMenuButton>
+                                        {item.count !== undefined && item.count > 0 && (
+                                            <SidebarMenuBadge>
+                                                {item.count}
+                                            </SidebarMenuBadge>
+                                        )}
                                     </SidebarMenuItem>
                                 );
                             })}
@@ -156,25 +176,27 @@ export function AppSidebar() {
                         <SidebarMenu>
                             {otherMenus.map((item) => {
                                 const Icon = item.icon;
+                                const isActive = location.pathname === item.path;
 
                                 return (
                                     <SidebarMenuItem key={item.path}>
-                                        <SidebarMenuButton asChild >
-                                            <Link
-                                                to={item.path}
-                                                className="flex items-center w-full"
-                                            >
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={isActive}
+                                            tooltip={item.title}
+                                        >
+                                            <NavLink to={item.path}>
                                                 <Icon className="h-4 w-4 shrink-0" />
-
-                                                <div className="ml-2 flex items-center justify-between w-full group-data-[collapsible=icon]:hidden">
-                                                    <span>{item.title}</span>
-
-                                                    <span className="text-xs bg-secondary rounded-sm px-2 py-0.5">
-                                                        {item.count ?? 0}
-                                                    </span>
-                                                </div>
-                                            </Link>
+                                                <span className="transition-all duration-200 ease-linear group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:overflow-hidden">
+                                                    {item.title}
+                                                </span>
+                                            </NavLink>
                                         </SidebarMenuButton>
+                                        {item.count !== undefined && item.count > 0 && (
+                                            <SidebarMenuBadge>
+                                                {item.count}
+                                            </SidebarMenuBadge>
+                                        )}
                                     </SidebarMenuItem>
                                 );
                             })}
@@ -192,8 +214,8 @@ export function AppSidebar() {
                                     size="lg"
                                     className="w-full"
                                 >
-                                    <Avatar className="h-8 w-8 shrink-0">
-                                        <AvatarFallback>
+                                    <Avatar className="h-8 w-8 shrink-0 rounded-lg">
+                                        <AvatarFallback className="rounded-lg">
                                             {user?.name?.charAt(0).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
