@@ -7,6 +7,7 @@ import { errorMiddleware } from "./middleware/errorMiddleware";
 import logger from "./utils/logger";
 
 const app = express();
+const port = Number(process.env.PORT) || 3000
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +17,6 @@ app.use("/notes", noteRoutes);
 
 app.use(errorMiddleware);
 
-app.listen(3000, "0.0.0.0", () => {
-    logger.info("Server running on port 3000");
+app.listen(port, () => {
+    logger.info(`Server running on port ${port}`);
 });
