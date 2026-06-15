@@ -26,11 +26,11 @@ export default function LandingPage() {
             {/* ── NAV ── */}
             <header
                 className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                        ? "bg-[#0D0F14]/90 backdrop-blur-sm border-b border-white/5"
-                        : ""
+                    ? "bg-[#0D0F14]/90 backdrop-blur-sm border-b border-white/5"
+                    : ""
                     }`}
             >
-                <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+                <div className=" mx-auto flex items-center justify-between px-6 py-4">
                     <a
                         href="/"
                         className="flex items-center gap-2 hover:opacity-80 transition-opacity"
@@ -69,10 +69,10 @@ export default function LandingPage() {
             {/* ── HERO ── */}
             <main
                 ref={heroRef}
-                className="min-h-screen flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 px-6 pt-28 pb-20 max-w-6xl mx-auto"
+                className="min-h-screen flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 px-6 pt-28 pb-20 mx-auto"
             >
                 {/* Left — copy */}
-                <div className="flex-1 max-w-xl text-center lg:text-left">
+                <div className="flex-1 max-w-2xl text-center lg:text-left">
                     <span className="inline-block mb-5 px-3 py-1 text-xs font-medium rounded-full bg-[#E8A838]/10 text-[#E8A838] border border-[#E8A838]/20 tracking-wide uppercase">
                         Your ideas, always within reach
                     </span>
@@ -154,8 +154,8 @@ export default function LandingPage() {
                                     Update the roadmap doc
                                     <span
                                         className={`inline-block w-0.5 h-4 bg-[#E8A838] ml-1 align-middle transition-opacity duration-100 ${cursorVisible
-                                                ? "opacity-100"
-                                                : "opacity-0"
+                                            ? "opacity-100"
+                                            : "opacity-0"
                                             }`}
                                     />
                                 </li>
