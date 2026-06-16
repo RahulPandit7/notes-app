@@ -19,7 +19,7 @@ export const errorMiddleware = (
 
     return res.status(500).json({
         success: false,
-        message: err.message || "Internal Server Error",
+        message: err.message || "test user ",
         stack: err.stack,
     });
 };
