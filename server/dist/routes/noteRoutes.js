@@ -1,0 +1,23 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const noteController_1 = require("../controllers/noteController");
+const asyncHandler_1 = require("../middleware/asyncHandler");
+const validateRequest_1 = require("../middleware/validateRequest");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const notes_1 = require("../validators/notes");
+const router = (0, express_1.Router)();
+// All note routes require a valid JWT
+router.use(authMiddleware_1.authenticate);
+router.get("/own", authMiddleware_1.authenticate, (0, asyncHandler_1.asyncHandler)(noteController_1.ownNotes));
+router.get("/", (0, asyncHandler_1.asyncHandler)(noteController_1.fetchNotes));
+router.post("/", (0, validateRequest_1.validateRequest)(notes_1.noteSchema, "body"), (0, asyncHandler_1.asyncHandler)(noteController_1.addNote));
+router.delete("/:id", (0, validateRequest_1.validateRequest)(notes_1.noteIdParamSchema, "params"), (0, asyncHandler_1.asyncHandler)(noteController_1.deleteNote));
+router.put("/:id", (0, validateRequest_1.validateRequest)(notes_1.noteIdParamSchema, "params"), (0, validateRequest_1.validateRequest)(notes_1.noteSchema, "body"), (0, asyncHandler_1.asyncHandler)(noteController_1.updateNote));
+router.patch("/:id/pin", (0, validateRequest_1.validateRequest)(notes_1.noteIdParamSchema, "params"), (0, asyncHandler_1.asyncHandler)(noteController_1.togglePinned));
+router.patch("/:id/favorite", (0, validateRequest_1.validateRequest)(notes_1.noteIdParamSchema, "params"), (0, asyncHandler_1.asyncHandler)(noteController_1.toggleFavorite));
+router.get("/stats", (0, asyncHandler_1.asyncHandler)(noteController_1.fetchNotesStatus));
+router.get("/trash", (0, asyncHandler_1.asyncHandler)(noteController_1.fetchTrashNotes));
+router.patch("/:id/restore", (0, validateRequest_1.validateRequest)(notes_1.noteIdParamSchema, "params"), (0, asyncHandler_1.asyncHandler)(noteController_1.restoreNote));
+router.delete("/:id/permanent", (0, validateRequest_1.validateRequest)(notes_1.noteIdParamSchema, "params"), (0, asyncHandler_1.asyncHandler)(noteController_1.permanentlyDeleteNote));
+exports.default = router;
