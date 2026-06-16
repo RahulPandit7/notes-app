@@ -8,7 +8,7 @@ export const errorMiddleware = (
     res: Response,
     next: NextFunction
 ) => {
-    logger.error(err.message || err);
+    logger.error(err);
 
     if (err instanceof AppError) {
         return res.status(err.statusCode).json({
@@ -19,6 +19,7 @@ export const errorMiddleware = (
 
     return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: err.message || "Internal Server Error",
+        stack: err.stack,
     });
 };
