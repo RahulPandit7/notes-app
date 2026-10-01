@@ -78,16 +78,21 @@ jobs:
           set -e
 
           mkdir -p "$HOME/.ssh"
-
           printf '%s\n' "$CPANEL_SSH_KEY" > "$HOME/.ssh/id_rsa"
-
           chmod 600 "$HOME/.ssh/id_rsa"
 
           echo "Checking SSH private key..."
           ssh-keygen -y -f "$HOME/.ssh/id_rsa" > /dev/null
+          echo "Private key is valid."
 
-          echo "Adding host..."
-          ssh-keyscan \
+          echo "Host: $CPANEL_HOST"
+          echo "Port: $CPANEL_SSH_PORT"
+
+          echo "Testing network connection..."
+          timeout 10 bash -c "</dev/tcp/$CPANEL_HOST/$CPANEL_SSH_PORT"
+
+          echo "Testing ssh-keyscan..."
+          ssh-keyscan -T 10 \
             -p "$CPANEL_SSH_PORT" \
             -H "$CPANEL_HOST" \
             >> "$HOME/.ssh/known_hosts"
