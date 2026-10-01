@@ -1,0 +1,108 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main # Change to master if your default branch is master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # ----------------------------------------------------
+      # 1. SETUP NODE.JS ENVIRONMENT
+      # ----------------------------------------------------
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
+
+      # ----------------------------------------------------
+      # 2. BUILD FRONTEND (CLIENT)
+      # ----------------------------------------------------
+      - name: Install Client Dependencies
+        run: |
+          cd client
+          npm ci
+
+      - name: Build Client
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+        run: |
+          cd client
+          npm run build
+
+      # ----------------------------------------------------
+      # 3. BUILD BACKEND (SERVER)
+      # ----------------------------------------------------
+      - name: Install Server Dependencies
+        run: |
+          cd server
+          npm ci
+
+      - name: Generate Prisma Client & Build Server
+        run: |
+          cd server
+          npx prisma generate
+          npm run build
+
+      # ----------------------------------------------------
+      # 4. PREPARE DEPLOYMENT ARTIFACTS
+      # ----------------------------------------------------
+      - name: Prepare Backend Package
+        run: |
+          mkdir -p deploy-server
+          cp -r server/dist deploy-server/
+          cp -r server/prisma deploy-server/
+          cp server/package.json deploy-server/
+          cp server/package-lock.json deploy-server/
+          cp server/app.js deploy-server/
+
+      # ----------------------------------------------------
+      # 5. DEPLOY TO CPANEL VIA SSH / RSYNC
+      # ----------------------------------------------------
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CPANEL_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p ${{ secrets.CPANEL_SSH_PORT || '22' }} -H ${{ secrets.CPANEL_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Sync Frontend to cPanel Web Root
+        run: |
+          rsync -avz --delete -e "ssh -p ${{ secrets.CPANEL_SSH_PORT || '22' }}" \
+            client/dist/ \
+            ${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}:${{ secrets.CPANEL_FRONTEND_PATH }}
+
+      - name: Sync Backend to cPanel Application Directory
+        run: |
+          rsync -avz --delete \
+            --exclude '.env' \
+            --exclude 'node_modules' \
+            --exclude 'tmp' \
+            -e "ssh -p ${{ secrets.CPANEL_SSH_PORT || '22' }}" \
+            deploy-server/ \
+            ${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}:${{ secrets.CPANEL_BACKEND_PATH }}/
+
+      - name: Install Production Deps, Run Prisma Migrations & Restart App
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          key: ${{ secrets.CPANEL_SSH_KEY }}
+          port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
+          script: |
+            cd ${{ secrets.CPANEL_BACKEND_PATH }}
+            export NODE_ENV=production
+            npm install --omit=dev
+            npx prisma migrate deploy
+            mkdir -p tmp
+            touch tmp/restart.txt
