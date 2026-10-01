@@ -71,7 +71,7 @@ jobs:
       # ----------------------------------------------------
       - name: Setup SSH Key
         run: |
-          mkdir -p ~/.ssh
+          mkdir -p "$HOME/.ssh"
           echo "${{ secrets.CPANEL_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p ${{ secrets.CPANEL_SSH_PORT || '22' }} -H ${{ secrets.CPANEL_HOST }} >> ~/.ssh/known_hosts
