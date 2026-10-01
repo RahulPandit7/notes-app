@@ -86,13 +86,13 @@ jobs:
           echo "Checking SSH private key..."
           ssh-keygen -y -f "$HOME/.ssh/id_rsa" > /dev/null
 
-          echo "Adding cPanel host to known_hosts..."
+          echo "Adding host..."
           ssh-keyscan \
             -p "$CPANEL_SSH_PORT" \
             -H "$CPANEL_HOST" \
             >> "$HOME/.ssh/known_hosts"
 
-          echo "SSH key setup completed."
+          echo "SSH setup completed."
 
       # ----------------------------------------------------
       # 6. TEST SSH CONNECTION
@@ -103,10 +103,6 @@ jobs:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT || '22' }}
         run: |
-          set -e
-
-          echo "Testing SSH connection to cPanel..."
-
           ssh \
             -i "$HOME/.ssh/id_rsa" \
             -p "$CPANEL_SSH_PORT" \
