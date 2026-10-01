@@ -11,13 +11,13 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # ----------------------------------------------------
       # 1. SETUP NODE.JS ENVIRONMENT
       # ----------------------------------------------------
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: 'npm'
@@ -67,42 +67,140 @@ jobs:
           cp server/app.js deploy-server/
 
       # ----------------------------------------------------
-      # 5. DEPLOY TO CPANEL VIA SSH / RSYNC
+      # 5. SETUP SSH KEY
       # ----------------------------------------------------
       - name: Setup SSH Key
+        env:
+          CPANEL_SSH_KEY: ${{ secrets.CPANEL_SSH_KEY }}
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT || '22' }}
         run: |
+          set -e
+
           mkdir -p "$HOME/.ssh"
-          echo "${{ secrets.CPANEL_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p ${{ secrets.CPANEL_SSH_PORT || '22' }} -H ${{ secrets.CPANEL_HOST }} >> ~/.ssh/known_hosts
 
+          printf '%s\n' "$CPANEL_SSH_KEY" > "$HOME/.ssh/id_rsa"
+
+          chmod 600 "$HOME/.ssh/id_rsa"
+
+          echo "Checking SSH private key..."
+          ssh-keygen -y -f "$HOME/.ssh/id_rsa" > /dev/null
+
+          echo "Adding cPanel host to known_hosts..."
+          ssh-keyscan \
+            -p "$CPANEL_SSH_PORT" \
+            -H "$CPANEL_HOST" \
+            >> "$HOME/.ssh/known_hosts"
+
+          echo "SSH key setup completed."
+
+      # ----------------------------------------------------
+      # 6. TEST SSH CONNECTION
+      # ----------------------------------------------------
+      - name: Test cPanel SSH Connection
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT || '22' }}
+        run: |
+          set -e
+
+          echo "Testing SSH connection to cPanel..."
+
+          ssh \
+            -i "$HOME/.ssh/id_rsa" \
+            -p "$CPANEL_SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$CPANEL_USER@$CPANEL_HOST" \
+            "echo 'SSH connection successful'"
+
+      # ----------------------------------------------------
+      # 7. SYNC FRONTEND TO CPANEL
+      # ----------------------------------------------------
       - name: Sync Frontend to cPanel Web Root
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT || '22' }}
+          CPANEL_FRONTEND_PATH: ${{ secrets.CPANEL_FRONTEND_PATH }}
         run: |
-          rsync -avz --delete -e "ssh -p ${{ secrets.CPANEL_SSH_PORT || '22' }}" \
-            client/dist/ \
-            ${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}:${{ secrets.CPANEL_FRONTEND_PATH }}
+          set -e
 
-      - name: Sync Backend to cPanel Application Directory
-        run: |
+          echo "Deploying frontend..."
+
           rsync -avz --delete \
-            --exclude '.env' \
-            --exclude 'node_modules' \
-            --exclude 'tmp' \
-            -e "ssh -p ${{ secrets.CPANEL_SSH_PORT || '22' }}" \
-            deploy-server/ \
-            ${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}:${{ secrets.CPANEL_BACKEND_PATH }}/
+            -e "ssh -i $HOME/.ssh/id_rsa -p $CPANEL_SSH_PORT" \
+            client/dist/ \
+            "$CPANEL_USER@$CPANEL_HOST:$CPANEL_FRONTEND_PATH/"
 
+          echo "Frontend deployment completed."
+
+      # ----------------------------------------------------
+      # 8. SYNC BACKEND TO CPANEL
+      # ----------------------------------------------------
+      - name: Sync Backend to cPanel Application Directory
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT || '22' }}
+          CPANEL_BACKEND_PATH: ${{ secrets.CPANEL_BACKEND_PATH }}
+        run: |
+          set -e
+
+          echo "Deploying backend..."
+
+          rsync -avz --delete \
+            --exclude ".env" \
+            --exclude "node_modules" \
+            --exclude "tmp" \
+            -e "ssh -i $HOME/.ssh/id_rsa -p $CPANEL_SSH_PORT" \
+            deploy-server/ \
+            "$CPANEL_USER@$CPANEL_HOST:$CPANEL_BACKEND_PATH/"
+
+          echo "Backend deployment completed."
+
+      # ----------------------------------------------------
+      # 9. INSTALL PRODUCTION DEPENDENCIES
+      #    RUN PRISMA MIGRATIONS
+      #    RESTART CPANEL NODE APP
+      # ----------------------------------------------------
       - name: Install Production Deps, Run Prisma Migrations & Restart App
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.CPANEL_SSH_KEY }}
-          port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
+          port: ${{ secrets.CPANEL_SSH_PORT || '22' }}
+          script_stop: true
           script: |
-            cd ${{ secrets.CPANEL_BACKEND_PATH }}
+            set -e
+
+            echo "Entering backend directory..."
+
+            cd "${{ secrets.CPANEL_BACKEND_PATH }}"
+
+            echo "Setting production environment..."
+
             export NODE_ENV=production
+
+            echo "Installing production dependencies..."
+
             npm install --omit=dev
+
+            echo "Generating Prisma client..."
+
+            npx prisma generate
+
+            echo "Running Prisma migrations..."
+
             npx prisma migrate deploy
+
+            echo "Creating restart file..."
+
             mkdir -p tmp
+
             touch tmp/restart.txt
+
+            echo "Deployment completed successfully."
+
