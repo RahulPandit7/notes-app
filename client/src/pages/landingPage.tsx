@@ -39,7 +39,7 @@ export default function LandingPage() {
                             R
                         </span>
                         <span className="text-base font-semibold tracking-tight">
-                            R & R Notes
+                            R & R 
                         </span>
                     </a>
 
