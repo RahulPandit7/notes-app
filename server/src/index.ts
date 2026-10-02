@@ -17,16 +17,13 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Health check route
-app.get(["/", "/randrnotes"], (req, res) => {
+app.get(["/"], (req, res) => {
     res.json({ status: "ok", message: "Notes API is running" });
 });
 
-// Support both standard routes and /randrnotes base URI
 app.use("/auth", authRoutes);
 app.use("/notes", noteRoutes);
-app.use("/randrnotes/auth", authRoutes);
-app.use("/randrnotes/notes", noteRoutes);
+
 
 app.use(errorMiddleware);
 

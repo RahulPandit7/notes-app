@@ -211,8 +211,11 @@ jobs:
             echo "Entering backend directory..."
             cd "${{ secrets.CPANEL_BACKEND_PATH }}"
 
-            echo "Loading cPanel Node.js 20..."
-            export PATH="/opt/alt/alt-nodejs20/root/usr/bin:$PATH"
+            echo "Backend path: $(pwd)"
+            ls -la
+
+            echo "Loading cPanel Node.js 22..."
+            export PATH="/opt/alt/alt-nodejs22/root/usr/bin:$PATH"
 
             echo "Node version:"
             node --version

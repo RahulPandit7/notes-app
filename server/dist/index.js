@@ -11,9 +11,17 @@ const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const errorMiddleware_1 = require("./middleware/errorMiddleware");
 const logger_1 = __importDefault(require("./utils/logger"));
 const app = (0, express_1.default)();
-const port = Number(process.env.PORT) || 3000;
-app.use((0, cors_1.default)());
+const port = process.env.PORT || 3000;
+app.use((0, cors_1.default)({
+    origin: true,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
 app.use(express_1.default.json());
+app.get(["/"], (req, res) => {
+    res.json({ status: "ok", message: "Notes API is running" });
+});
 app.use("/auth", authRoutes_1.default);
 app.use("/notes", noteRoutes_1.default);
 app.use(errorMiddleware_1.errorMiddleware);
