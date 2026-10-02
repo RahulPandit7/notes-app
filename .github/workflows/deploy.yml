@@ -138,14 +138,14 @@ jobs:
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$CPANEL_USER@$CPANEL_HOST" \
-            "mkdir -p '$CPANEL_FRONTEND_PATH' && rm -rf '$CPANEL_FRONTEND_PATH'/*"
+            "test -d '$CPANEL_FRONTEND_PATH' && test -w '$CPANEL_FRONTEND_PATH'"
 
           cat frontend.tar.gz | ssh \
-            -i "$HOME/.ssh/id_rsa" \
-            -p "$CPANEL_SSH_PORT" \
-            -o BatchMode=yes \
-            "$CPANEL_USER@$CPANEL_HOST" \
-            "tar -xzf - -C '$CPANEL_FRONTEND_PATH'"
+          -i "$HOME/.ssh/id_rsa" \
+          -p "$CPANEL_SSH_PORT" \
+          -o BatchMode=yes \
+          "$CPANEL_USER@$CPANEL_HOST" \
+          "tar -xzf - -C '$CPANEL_FRONTEND_PATH'"
 
           rm -f frontend.tar.gz
 
@@ -204,33 +204,36 @@ jobs:
           key: ${{ secrets.CPANEL_SSH_KEY }}
           port: ${{ secrets.CPANEL_SSH_PORT || '22' }}
           script_stop: true
+          command_timeout: 10m
           script: |
             set -e
 
             echo "Entering backend directory..."
-
             cd "${{ secrets.CPANEL_BACKEND_PATH }}"
 
-            echo "Setting production environment..."
+            echo "Loading cPanel Node.js 20..."
+            export PATH="/opt/alt/alt-nodejs20/root/usr/bin:$PATH"
 
+            echo "Node version:"
+            node --version
+
+            echo "NPM version:"
+            npm --version
+
+            echo "Setting production environment..."
             export NODE_ENV=production
 
             echo "Installing production dependencies..."
-
             npm install --omit=dev
 
             echo "Generating Prisma client..."
-
             npx prisma generate
 
             echo "Running Prisma migrations..."
-
             npx prisma migrate deploy
 
             echo "Creating restart file..."
-
             mkdir -p tmp
-
             touch tmp/restart.txt
 
             echo "Deployment completed successfully."
