@@ -30,6 +30,18 @@ const axiosBaseQuery =
                     params,
                 });
 
+                // Detect if server returned index.html (e.g. Apache rewrite) instead of JSON
+                if (typeof result.data === "string" && result.data.trim().toLowerCase().startsWith("<!doctype html")) {
+                    return {
+                        error: {
+                            status: 502,
+                            data: {
+                                message: "API endpoint returned HTML instead of JSON. Ensure the backend server is running and accessible.",
+                            },
+                        },
+                    };
+                }
+
                 return {
                     data: result.data,
                 };
