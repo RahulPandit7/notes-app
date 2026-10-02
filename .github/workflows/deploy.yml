@@ -119,45 +119,75 @@ jobs:
       # ----------------------------------------------------
       # 7. SYNC FRONTEND TO CPANEL
       # ----------------------------------------------------
-      - name: Sync Frontend to cPanel Web Root
+      - name: Deploy Frontend to cPanel
         env:
           CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
-          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT || '22' }}
+          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT }}
           CPANEL_FRONTEND_PATH: ${{ secrets.CPANEL_FRONTEND_PATH }}
         run: |
           set -e
 
           echo "Deploying frontend..."
 
-          rsync -avz --delete \
-            -e "ssh -i $HOME/.ssh/id_rsa -p $CPANEL_SSH_PORT" \
-            client/dist/ \
-            "$CPANEL_USER@$CPANEL_HOST:$CPANEL_FRONTEND_PATH/"
+          tar -czf frontend.tar.gz -C client/dist .
+
+          ssh \
+            -i "$HOME/.ssh/id_rsa" \
+            -p "$CPANEL_SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$CPANEL_USER@$CPANEL_HOST" \
+            "mkdir -p '$CPANEL_FRONTEND_PATH' && rm -rf '$CPANEL_FRONTEND_PATH'/*"
+
+          cat frontend.tar.gz | ssh \
+            -i "$HOME/.ssh/id_rsa" \
+            -p "$CPANEL_SSH_PORT" \
+            -o BatchMode=yes \
+            "$CPANEL_USER@$CPANEL_HOST" \
+            "tar -xzf - -C '$CPANEL_FRONTEND_PATH'"
+
+          rm -f frontend.tar.gz
 
           echo "Frontend deployment completed."
 
       # ----------------------------------------------------
       # 8. SYNC BACKEND TO CPANEL
       # ----------------------------------------------------
-      - name: Sync Backend to cPanel Application Directory
+      - name: Deploy Backend to cPanel
         env:
           CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
-          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT || '22' }}
+          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT }}
           CPANEL_BACKEND_PATH: ${{ secrets.CPANEL_BACKEND_PATH }}
         run: |
           set -e
 
           echo "Deploying backend..."
 
-          rsync -avz --delete \
-            --exclude ".env" \
-            --exclude "node_modules" \
-            --exclude "tmp" \
-            -e "ssh -i $HOME/.ssh/id_rsa -p $CPANEL_SSH_PORT" \
-            deploy-server/ \
-            "$CPANEL_USER@$CPANEL_HOST:$CPANEL_BACKEND_PATH/"
+          tar \
+            --exclude=".env" \
+            --exclude="node_modules" \
+            --exclude="tmp" \
+            -czf backend.tar.gz \
+            -C deploy-server .
+
+          ssh \
+            -i "$HOME/.ssh/id_rsa" \
+            -p "$CPANEL_SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$CPANEL_USER@$CPANEL_HOST" \
+            "mkdir -p '$CPANEL_BACKEND_PATH'"
+
+          cat backend.tar.gz | ssh \
+            -i "$HOME/.ssh/id_rsa" \
+            -p "$CPANEL_SSH_PORT" \
+            -o BatchMode=yes \
+            "$CPANEL_USER@$CPANEL_HOST" \
+            "tar -xzf - -C '$CPANEL_BACKEND_PATH'"
+
+          rm -f backend.tar.gz
 
           echo "Backend deployment completed."
 
