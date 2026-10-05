@@ -7,7 +7,7 @@ import TaskItem from '@tiptap/extension-task-item';
 import Underline from '@tiptap/extension-underline';
 import CharacterCount from '@tiptap/extension-character-count';
 import ImageBase from '@tiptap/extension-image';
-import { Node, mergeAttributes } from '@tiptap/core';
+import { mergeAttributes } from '@tiptap/core';
 import toast from 'react-hot-toast';
 import {
     Bold, Italic, Underline as UnderlineIcon, Strikethrough,
