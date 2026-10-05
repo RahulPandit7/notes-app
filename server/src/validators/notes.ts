@@ -8,7 +8,7 @@ export const noteSchema = z.object({
         .optional(),
     content: z
         .string()
-        .max(50_000, "Content must be at most 50000 characters")
+        .max(10_000_000, "Content must be at most 10MB")
         .optional(),
 });
 
