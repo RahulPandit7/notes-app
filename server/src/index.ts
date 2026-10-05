@@ -13,7 +13,9 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:3000",
     "https://randrnotes.toolbaaar.com",
+    "http://randrnotes.toolbaaar.com",
     "https://www.randrnotes.toolbaaar.com",
+"http://www.randrnotes.toolbaaar.com"
 ];
 
 const corsOptions: cors.CorsOptions = {
