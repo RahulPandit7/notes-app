@@ -104,7 +104,7 @@ function App() {
           {/* Welcome hero card — hero route only, hidden while the note form is open */}
           {showBanner && (
             <section className="px-3 pt-4 sm:px-6 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-safe:duration-500">
-              <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl bg-primary p-6 text-primary-foreground shadow-lg sm:p-8">
+              <div className="relative mx-auto overflow-hidden rounded-3xl bg-primary p-6 text-primary-foreground shadow-lg sm:p-8">
                 {/* Dot grid texture */}
                 <div
                   aria-hidden
@@ -157,7 +157,7 @@ function App() {
 
           {/* Page content */}
           <div className="flex-1 overflow-auto px-3 py-5 sm:px-6 sm:py-6">
-            <div className="mx-auto h-full max-w-6xl">
+            <div className="mx-auto h-full">
               <Outlet
                 context={{ showAddForm, setShowAddForm, editingNote, setEditingNote }}
               />
