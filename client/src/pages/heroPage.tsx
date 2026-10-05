@@ -16,9 +16,6 @@ import {
     Calendar,
     Sparkles,
     PenLine,
-    ImageIcon,
-    CheckSquare,
-    BookOpen
 } from "lucide-react";
 
 export default function HeroPage() {
