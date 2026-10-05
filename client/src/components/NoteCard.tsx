@@ -147,7 +147,7 @@ export const NoteCard = ({
             </CardHeader>
             <CardContent className="flex-1 text-sm text-muted-foreground overflow-hidden relative pb-5">
                 <div className="line-clamp-5">
-                    <SafeHtml html={note.content} />
+                    <SafeHtml html={note.content} className="[&_img]:max-h-32 [&_img]:w-auto [&_img]:rounded-md [&_img]:object-cover [&_img]:my-1" />
                 </div>
                 {/* Bottom shadow fade overlay */}
                 <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent pointer-events-none" />

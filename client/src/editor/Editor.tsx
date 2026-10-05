@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEditor, EditorContent, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import Underline from '@tiptap/extension-underline';
 import CharacterCount from '@tiptap/extension-character-count';
+import ImageBase from '@tiptap/extension-image';
+import { Node, mergeAttributes } from '@tiptap/core';
+import toast from 'react-hot-toast';
 import {
     Bold, Italic, Underline as UnderlineIcon, Strikethrough,
     Heading1, Heading2, Heading3,
     AlignLeft, List, ListTodo, Quote, Code, Minus,
-    Copy, Calendar, Clock
+    Copy, Calendar, Clock, ImageIcon, X
 } from 'lucide-react';
 
 interface EditorProps {
@@ -20,13 +23,218 @@ interface EditorProps {
     onChangeContent: (content: string) => void;
 }
 
+// Resizable Image NodeView Component
+function ResizableImageNodeView({ node, updateAttributes, selected, deleteNode }: any) {
+    const [resizing, setResizing] = useState(false);
+    const startX = useRef(0);
+    const startW = useRef(0);
+    const startH = useRef(0);
+    const imgRef = useRef<HTMLImageElement>(null);
+
+    const width = Number(node.attrs.width) || 200;
+    const height = Number(node.attrs.height) || 200;
+
+    const onMouseDown = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startX.current = e.clientX;
+        startW.current = imgRef.current?.offsetWidth || width;
+        startH.current = imgRef.current?.offsetHeight || height;
+        setResizing(true);
+    }, [width, height]);
+
+    useEffect(() => {
+        const onMove = (e: MouseEvent) => {
+            if (!resizing) return;
+            const diffX = e.clientX - startX.current;
+            const ratio = startW.current > 0 ? startH.current / startW.current : 1;
+            const newW = Math.max(50, Math.round(startW.current + diffX));
+            const newH = Math.max(50, Math.round(newW * ratio));
+            updateAttributes({ width: newW, height: newH });
+        };
+        const onUp = () => setResizing(false);
+        if (resizing) {
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+        }
+        return () => {
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+        };
+    }, [resizing, updateAttributes]);
+
+    return (
+        <NodeViewWrapper
+            style={{ display: 'inline-block', position: 'relative', maxWidth: '100%', margin: '6px 0' }}
+            data-drag-handle
+        >
+            <div
+                className="group/img relative inline-block leading-none rounded-md transition-all"
+                style={{
+                    outline: selected ? '2px solid hsl(var(--primary))' : '2px solid transparent',
+                    outlineOffset: 2,
+                    cursor: resizing ? 'se-resize' : 'default',
+                }}
+            >
+                <img
+                    ref={imgRef}
+                    src={node.attrs.src}
+                    alt={node.attrs.alt ?? ''}
+                    width={width}
+                    height={height}
+                    style={{
+                        width: `${width}px`,
+                        height: `${height}px`,
+                        maxWidth: '100%',
+                        display: 'block',
+                        borderRadius: 6,
+                        objectFit: 'cover',
+                    }}
+                    draggable={false}
+                />
+
+                {/* Close / Remove Image Button */}
+                <button
+                    type="button"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        deleteNode();
+                    }}
+                    title="Remove image"
+                    aria-label="Remove image"
+                    className={`absolute top-1.5 right-1.5 p-1 rounded-full bg-black/70 hover:bg-destructive text-white border border-white/30 shadow-md transition-all duration-150 cursor-pointer flex items-center justify-center z-10 ${
+                        selected ? 'opacity-100 scale-100' : 'opacity-0 group-hover/img:opacity-100 scale-95 group-hover/img:scale-100'
+                    }`}
+                >
+                    <X size={12} strokeWidth={2.5} />
+                </button>
+
+                {/* Resize handle — bottom-right corner */}
+                {selected && (
+                    <div
+                        onMouseDown={onMouseDown}
+                        title="Drag to resize"
+                        style={{
+                            position: 'absolute',
+                            right: -6,
+                            bottom: -6,
+                            width: 14,
+                            height: 14,
+                            background: 'hsl(var(--primary))',
+                            border: '2px solid white',
+                            borderRadius: 3,
+                            cursor: 'se-resize',
+                            zIndex: 10,
+                            boxShadow: '0 2px 5px rgba(0,0,0,0.35)',
+                        }}
+                    />
+                )}
+                {/* Size label while resizing */}
+                {resizing && (
+                    <div style={{
+                        position: 'absolute',
+                        top: -30,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: '#374151',
+                        color: '#f9fafb',
+                        fontSize: 11,
+                        padding: '2px 8px',
+                        borderRadius: 4,
+                        whiteSpace: 'nowrap',
+                        pointerEvents: 'none',
+                        fontFamily: 'monospace',
+                        zIndex: 20,
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                    }}>
+                        {Math.round(width)}px × {Math.round(height)}px
+                    </div>
+                )}
+            </div>
+        </NodeViewWrapper>
+    );
+}
+
+// Custom Image extension with width and height attributes & ResizableImage NodeView
+const ResizableImage = ImageBase.extend({
+    name: 'image',
+    addOptions() {
+        return {
+            ...this.parent?.(),
+            inline: false,
+            allowBase64: true,
+        };
+    },
+    addAttributes() {
+        return {
+            ...this.parent?.(),
+            src: {
+                default: null,
+                parseHTML: el => el.getAttribute('src'),
+                renderHTML: attrs => attrs.src ? { src: attrs.src } : {},
+            },
+            alt: {
+                default: null,
+                parseHTML: el => el.getAttribute('alt'),
+                renderHTML: attrs => attrs.alt ? { alt: attrs.alt } : {},
+            },
+            width: {
+                default: 200,
+                parseHTML: el => {
+                    const w = el.getAttribute('width') || el.style.width;
+                    if (w) {
+                        const parsed = parseInt(w, 10);
+                        return isNaN(parsed) ? 200 : parsed;
+                    }
+                    return 200;
+                },
+                renderHTML: attrs => ({
+                    width: attrs.width ?? 200,
+                }),
+            },
+            height: {
+                default: 200,
+                parseHTML: el => {
+                    const h = el.getAttribute('height') || el.style.height;
+                    if (h) {
+                        const parsed = parseInt(h, 10);
+                        return isNaN(parsed) ? 200 : parsed;
+                    }
+                    return 200;
+                },
+                renderHTML: attrs => ({
+                    height: attrs.height ?? 200,
+                }),
+            },
+        };
+    },
+    parseHTML() {
+        return [
+            {
+                tag: 'img[src]',
+            },
+        ];
+    },
+    renderHTML({ HTMLAttributes }) {
+        return ['img', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)];
+    },
+    addNodeView() {
+        return ReactNodeViewRenderer(ResizableImageNodeView);
+    },
+});
+
+
 export default function Editor({ title, content, onChangeTitle, onChangeContent }: EditorProps) {
     const [wordCount, setWordCount] = useState(0);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const editor = useEditor({
         extensions: [
             StarterKit,
             Underline,
+            ResizableImage.configure({ inline: false, allowBase64: true }),
             Placeholder.configure({
                 placeholder: 'Start writing...',
             }),
@@ -64,6 +272,30 @@ export default function Editor({ title, content, onChangeTitle, onChangeContent 
     if (!editor) {
         return null;
     }
+
+    const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !editor) return;
+
+        if (file.size > 7 * 1024 * 1024) {
+            toast.error("Image size must be less than 7MB");
+            e.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const src = ev.target?.result as string;
+            editor.chain().focus().setImage({
+                src,
+                width: 200,
+                height: 200,
+            }).run();
+        };
+        reader.readAsDataURL(file);
+        // reset so same file can be re-selected
+        e.target.value = '';
+    }, [editor]);
 
     const ToolbarButton = ({ onClick, isActive = false, title, children }: { onClick: () => void, isActive?: boolean, title?: string, children: React.ReactNode }) => (
         <button
@@ -358,6 +590,17 @@ export default function Editor({ title, content, onChangeTitle, onChangeContent 
                 </div>
                 <div className="flex-1" />
                 <div className="flex items-center space-x-1 pr-1">
+                    {/* Hidden image file input */}
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                    />
+                    <ToolbarButton onClick={() => fileInputRef.current?.click()} title="Insert Image">
+                        <ImageIcon size={15} strokeWidth={2.5} />
+                    </ToolbarButton>
                     <ToolbarButton onClick={() => navigator.clipboard.writeText(editor.getText())} title="Copy Text">
                         <Copy size={15} strokeWidth={2.5} />
                     </ToolbarButton>
