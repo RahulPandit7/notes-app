@@ -2,10 +2,6 @@
   RewriteEngine On
   RewriteBase /
 
-  # Do not rewrite backend API requests to index.html (supports both /auth and /randrnotes/auth)
-  RewriteCond %{REQUEST_URI} (auth|notes) [NC]
-  RewriteRule ^ - [L]
-
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
