@@ -160,13 +160,6 @@ function ResizableImageNodeView({ node, updateAttributes, selected, deleteNode }
 // Custom Image extension with width and height attributes & ResizableImage NodeView
 const ResizableImage = ImageBase.extend({
     name: 'image',
-    addOptions() {
-        return {
-            ...this.parent?.(),
-            inline: false,
-            allowBase64: true,
-        };
-    },
     addAttributes() {
         return {
             ...this.parent?.(),
