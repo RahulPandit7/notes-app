@@ -65,10 +65,11 @@ export default function Editor({ title, content, onChangeTitle, onChangeContent 
         return null;
     }
 
-    const ToolbarButton = ({ onClick, isActive = false, children }: { onClick: () => void, isActive?: boolean, children: React.ReactNode }) => (
+    const ToolbarButton = ({ onClick, isActive = false, title, children }: { onClick: () => void, isActive?: boolean, title?: string, children: React.ReactNode }) => (
         <button
             type="button"
             onClick={onClick}
+            title={title}
             className={`p-1.5 rounded-md flex items-center justify-center transition-all duration-200 ${isActive
                 ? 'bg-primary/10 text-primary'
                 : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -83,7 +84,7 @@ export default function Editor({ title, content, onChangeTitle, onChangeContent 
     );
 
     return (
-        <div className="flex flex-col bg-background text-foreground font-sans w-full border rounded-lg shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-ring transition-shadow">
+        <div className="flex flex-col bg-background text-foreground font-sans w-full h-full border rounded-lg shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-ring transition-shadow">
             <style>{`
                 .tiptap-custom-editor {
                     outline: none;
@@ -137,39 +138,136 @@ export default function Editor({ title, content, onChangeTitle, onChangeContent 
                     margin-bottom: 0.75rem;
                 }
                 .tiptap-custom-editor blockquote {
-                    border-left: 3px solid hsl(var(--border));
-                    padding-left: 1rem;
-                    margin-left: 0;
-                    margin-right: 0;
-                    margin-top: 0.75rem;
-                    margin-bottom: 0.75rem;
+                    position: relative;
+                    border-left: 4px solid hsl(var(--primary) / 0.7);
+                    padding: 0.75rem 1rem 0.75rem 2.25rem;
+                    margin: 1.25rem 0;
                     font-style: italic;
-                    color: hsl(var(--muted-foreground));
-                    background: hsl(var(--muted) / 0.3);
-                    padding-top: 0.5rem;
-                    padding-bottom: 0.5rem;
+                    color: hsl(var(--foreground) / 0.85);
+                    background: none;
                     border-radius: 0 0.5rem 0.5rem 0;
+                    animation: quote-in 0.25s ease both;
+                }
+                @keyframes quote-in {
+                    from { opacity: 0; transform: translateX(-6px); }
+                    to   { opacity: 1; transform: translateX(0); }
+                }
+                .tiptap-custom-editor blockquote::before {
+                    content: '\u201C';
+                    position: absolute;
+                    left: 0.4rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    font-size: 2rem;
+                    line-height: 1;
+                    font-family: Georgia, serif;
+                    font-style: normal;
+                    color: hsl(var(--primary) / 0.5);
+                    pointer-events: none;
+                    user-select: none;
+                }
+                .tiptap-custom-editor blockquote p {
+                    margin-bottom: 0;
+                    line-height: 1.75;
+                }
+                .tiptap-custom-editor blockquote p + p {
+                    margin-top: 0.5rem;
+                }
+                .tiptap-custom-editor blockquote p:last-child::after {
+                    content: '\u201D';
+                    display: inline;
+                    font-size: 2rem;
+                    line-height: 0;
+                    vertical-align: -0.45em;
+                    font-family: Georgia, serif;
+                    font-style: normal;
+                    color: hsl(var(--primary) / 0.5);
+                    margin-left: 0.05em;
+                    user-select: none;
                 }
                 .tiptap-custom-editor pre {
-                    background: hsl(var(--muted));
-                    border-radius: 0.5rem;
-                    padding: 1rem;
-                    font-family: monospace;
+                    position: relative;
+                    display: inline-block;
+                    width: fit-content;
+                    max-width: 100%;
+                    background: #1a1a2e;
+                    border-radius: 0.625rem;
+                    padding: 2.75rem 1.25rem 1.25rem 1.25rem;
+                    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+                    font-size: 0.875rem;
+                    line-height: 1.7;
                     overflow-x: auto;
-                    margin-top: 0.75rem;
-                    margin-bottom: 0.75rem;
+                    margin-top: 1rem;
+                    margin-bottom: 1rem;
+                    border: 1px solid rgba(255,255,255,0.07);
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
                 }
-                .tiptap-custom-editor code {
-                    background: hsl(var(--muted));
-                    padding: 0.2rem 0.4rem;
-                    border-radius: 0.25rem;
-                    font-family: monospace;
-                    font-size: 0.9em;
+                .tiptap-custom-editor pre::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 2rem;
+                    background: #111122;
+                    border-radius: 0.625rem 0.625rem 0 0;
+                    border-bottom: 1px solid rgba(255,255,255,0.06);
+                }
+                .tiptap-custom-editor pre::after {
+                    content: '\u2022\u2022\u2022';
+                    position: absolute;
+                    top: 0.45rem;
+                    left: 0.75rem;
+                    font-size: 1.1rem;
+                    letter-spacing: 0.25rem;
+                    color: rgba(255,255,255,0.2);
+                    pointer-events: none;
+                }
+                .tiptap-custom-editor pre code {
+                    background: none;
+                    padding: 0;
+                    border-radius: 0;
+                    font-size: inherit;
+                    color: #e2e8f0;
+                    display: block;
+                    white-space: pre;
+                }
+                .tiptap-custom-editor code:not(pre code) {
+                    background: hsl(var(--primary) / 0.1);
+                    color: hsl(var(--primary));
+                    padding: 0.15rem 0.45rem;
+                    border-radius: 0.3rem;
+                    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+                    font-size: 0.875em;
+                    border: 1px solid hsl(var(--primary) / 0.15);
+                    font-weight: 500;
                 }
                 .tiptap-custom-editor hr {
+                    position: relative;
+                    display: block;
+                    width: 100%;
                     border: none;
-                    border-top: 2px solid hsl(var(--border) / 0.5);
-                    margin: 1.5rem 0;
+                    height: 1px;
+                    margin: 2rem 0;
+                    background: linear-gradient(
+                        to right,
+                        transparent,
+                        hsl(var(--border)),
+                        transparent
+                    );
+                }
+                .tiptap-custom-editor hr::after {
+                    content: '\u25C6';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: hsl(var(--background));
+                    padding: 0 0.5rem;
+                    font-size: 0.55rem;
+                    color: hsl(var(--border));
+                    line-height: 1;
+                    user-select: none;
                 }
                 .tiptap-custom-editor ul[data-type="taskList"] {
                     list-style: none;
@@ -190,74 +288,90 @@ export default function Editor({ title, content, onChangeTitle, onChangeContent 
                 }
             `}</style>
 
-            {/* Top Toolbar */}
-            <div className="flex flex-wrap items-center gap-y-1 border-b border-border/60 px-2 py-1.5 bg-muted/20">
+            {/* Top Toolbar - Fixed */}
+            <div className="flex-shrink-0 flex flex-wrap items-center gap-y-1 border-b border-border/60 px-2 py-1.5 bg-muted/20">
                 <div className="flex items-center space-x-0.5">
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')}>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')} title="Bold">
                         <Bold size={15} strokeWidth={2.5} />
                     </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive('italic')}>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive('italic')} title="Italic">
                         <Italic size={15} strokeWidth={2.5} />
                     </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()} isActive={editor.isActive('underline')}>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()} isActive={editor.isActive('underline')} title="Underline">
                         <UnderlineIcon size={15} strokeWidth={2.5} />
                     </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} isActive={editor.isActive('strike')}>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} isActive={editor.isActive('strike')} title="Strikethrough">
                         <Strikethrough size={15} strokeWidth={2.5} />
                     </ToolbarButton>
 
                     <Divider />
 
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} isActive={editor.isActive('heading', { level: 1 })}>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} isActive={editor.isActive('heading', { level: 1 })} title="Heading 1">
                         <Heading1 size={15} strokeWidth={2.5} />
                     </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} isActive={editor.isActive('heading', { level: 2 })}>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} isActive={editor.isActive('heading', { level: 2 })} title="Heading 2">
                         <Heading2 size={15} strokeWidth={2.5} />
                     </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} isActive={editor.isActive('heading', { level: 3 })}>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} isActive={editor.isActive('heading', { level: 3 })} title="Heading 3">
                         <Heading3 size={15} strokeWidth={2.5} />
                     </ToolbarButton>
 
                     <Divider />
 
-                    <ToolbarButton onClick={() => { }}>
+                    <ToolbarButton onClick={() => { }} title="Align Left">
                         <AlignLeft size={15} strokeWidth={2.5} />
                     </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive('bulletList')}>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive('bulletList')} title="Bullet List">
                         <List size={15} strokeWidth={2.5} />
                     </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleTaskList().run()} isActive={editor.isActive('taskList')}>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleTaskList().run()} isActive={editor.isActive('taskList')} title="Task List">
                         <ListTodo size={15} strokeWidth={2.5} />
                     </ToolbarButton>
 
                     <Divider />
 
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')}>
+                    <ToolbarButton
+                        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                        isActive={editor.isActive('blockquote')}
+                        title="Blockquote"
+                    >
                         <Quote size={15} strokeWidth={2.5} />
                     </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleCodeBlock().run()} isActive={editor.isActive('codeBlock')}>
+                    <ToolbarButton
+                        onClick={() => {
+                            if (editor.isActive('codeBlock')) {
+                                editor.chain().focus().toggleCodeBlock().run();
+                            } else if (!editor.state.selection.empty) {
+                                editor.chain().focus().toggleCode().run();
+                            } else {
+                                editor.chain().focus().toggleCodeBlock().run();
+                            }
+                        }}
+                        isActive={editor.isActive('codeBlock') || editor.isActive('code')}
+                        title="Code"
+                    >
                         <Code size={15} strokeWidth={2.5} />
                     </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+                    <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Divider">
                         <Minus size={15} strokeWidth={2.5} />
                     </ToolbarButton>
                 </div>
                 <div className="flex-1" />
                 <div className="flex items-center space-x-1 pr-1">
-                    <ToolbarButton onClick={() => navigator.clipboard.writeText(editor.getText())}>
+                    <ToolbarButton onClick={() => navigator.clipboard.writeText(editor.getText())} title="Copy Text">
                         <Copy size={15} strokeWidth={2.5} />
                     </ToolbarButton>
                 </div>
             </div>
 
-            {/* Editor Area */}
-            <div className="flex-1 w-full p-4 flex flex-col gap-4">
+            {/* Editor Area - Scrollable */}
+            <div className="flex-1 w-full p-3 flex flex-col gap-4 overflow-y-auto">
                 <input
                     type="text"
                     value={title}
                     onChange={(e) => onChangeTitle(e.target.value)}
                     placeholder="Note Title"
-                    className="w-full bg-transparent text-2xl font-serif font-bold text-foreground placeholder:text-muted-foreground/40 focus:outline-none transition-all"
+                    className="w-full bg-transparent text-xl font-serif font-bold text-foreground placeholder:text-muted-foreground/40 focus:outline-none transition-all"
                 />
 
                 <div className="flex items-center flex-wrap gap-4 text-xs text-muted-foreground/80 pb-3 border-b border-border/40">
