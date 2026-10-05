@@ -81,7 +81,7 @@ export default function HeroPage() {
     ];
 
     return (
-        <div className="max-w-6xl mx-auto w-full pb-10 space-y-8 animate-in fade-in duration-300">
+        <div className=" mx-auto w-full pb-10 space-y-8 animate-in fade-in duration-300">
 
             {/* Note Editor Area (when open) */}
             {isFormOpen ? (
