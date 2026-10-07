@@ -13,6 +13,7 @@ import {
     Trash,
     ArrowUpRight,
     PenLine,
+    Sparkles,
 } from "lucide-react";
 
 export default function HeroPage() {
@@ -92,26 +93,77 @@ export default function HeroPage() {
                 </div>
             ) : (
                 <>
+
                     {/* Quick Create Note Prompt */}
                     <div
                         onClick={() => dispatch(openNoteForm())}
                         role="button"
                         tabIndex={0}
-                        onKeyDown={(e) => e.key === "Enter" && dispatch(openNoteForm())}
-                        className="group flex items-center justify-between p-4 px-5 rounded-xl border border-dashed border-border/80 bg-muted/20 hover:bg-muted/40 hover:border-primary/50 transition-all cursor-pointer shadow-xs"
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                dispatch(openNoteForm());
+                            }
+                        }}
+                        className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-2xl p-4 sm:p-5 cursor-pointer
+               bg-gradient-to-r from-fuchsia-600 via-pink-500 to-purple-600
+               shadow-lg shadow-fuchsia-500/30
+               transition-all duration-300
+               hover:-translate-y-0.5 hover:shadow-xl hover:shadow-fuchsia-500/50
+               active:translate-y-0 active:scale-[0.99]
+               focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-fuchsia-400/50 focus-visible:ring-offset-2"
                     >
-                        <div className="flex items-center gap-3 text-muted-foreground group-hover:text-foreground transition-colors">
-                            <div className="p-2 rounded-lg bg-background border border-border/60 shadow-xs group-hover:border-primary/40 group-hover:text-primary transition-all">
-                                <PenLine size={18} />
+                        {/* Ambient glow blobs */}
+                        <div
+                            aria-hidden
+                            className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/20 blur-2xl transition-transform duration-500 group-hover:scale-150"
+                        />
+                        <div
+                            aria-hidden
+                            className="pointer-events-none absolute -bottom-12 -left-8 h-28 w-28 rounded-full bg-purple-300/30 blur-2xl"
+                        />
+
+                        {/* Shine sweep on hover */}
+                        <div
+                            aria-hidden
+                            className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full"
+                        />
+
+                        <div className="relative flex items-center gap-3.5 sm:gap-4 min-w-0">
+                            {/* Icon with soft pulse halo */}
+                            <div className="relative shrink-0">
+                                <span
+                                    aria-hidden
+                                    className="absolute inset-0 rounded-xl bg-white/40 animate-ping [animation-duration:2.5s]"
+                                />
+                                <div className="relative flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-white/20 text-white ring-1 ring-white/40 backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:bg-white/30">
+                                    <PenLine size={20} className="transition-transform duration-300 group-hover:-rotate-6" />
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-sm font-medium">Write something down...</p>
-                                <p className="text-xs text-muted-foreground">Click to start a new rich text note with images, lists, or checklists</p>
+
+                            <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-sm sm:text-base font-bold text-white">
+                                        Create New Note
+                                    </h3>
+                                    <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white ring-1 ring-white/30 backdrop-blur-sm">
+                                        <Sparkles size={11} /> Quick Note
+                                    </span>
+                                </div>
+                                <p className="text-xs sm:text-sm text-white/90 truncate">
+                                    Write something down... Click to start a new rich text note with images, lists, or checklists
+                                </p>
                             </div>
                         </div>
-                        <span className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                            Open editor <Plus size={14} />
-                        </span>
+
+                        {/* CTA pill: white so it pops against the gradient */}
+                        <div className="relative shrink-0">
+                            <span className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 sm:px-4 py-2 text-xs font-bold text-fuchsia-600 shadow-md transition-all duration-200 group-hover:shadow-lg group-hover:bg-fuchsia-50 active:scale-95">
+                                <Plus size={15} className="transition-transform duration-300 group-hover:rotate-90" />
+                                <span className="hidden sm:inline">Create Note</span>
+                                <span className="sm:hidden">New</span>
+                            </span>
+                        </div>
                     </div>
 
                     {/* Stats Navigation Grid */}

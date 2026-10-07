@@ -9,6 +9,7 @@ import { noteSchema, type NoteFormType } from "@/validators/note";
 import { closeNoteForm } from "@/store/slices/uiSlice";
 import { useDispatch } from "react-redux";
 import generateTitle from "@/helper/generateTitle ";
+import { useNavigate } from "react-router-dom";
 
 interface AddNoteFormProps {
     editingNote?: Note | null;
@@ -17,6 +18,7 @@ interface AddNoteFormProps {
 
 export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormProps) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [createNote, { isLoading: isCreating }] = useCreateNoteMutation();
     const [updateNote, { isLoading: isUpdating }] = useUpdateNoteMutation();
 
@@ -62,6 +64,7 @@ export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormPro
                 await createNote(payload).unwrap();
 
                 onClearEdit?.();
+                navigate("/app/notes");
             }
 
             methods.reset({
@@ -82,7 +85,7 @@ export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormPro
                 className="space-y-4 w-full"
             >
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold">{editingNote ? "Update Note" : "Add New Note"}</h2>
+                    <h2 className="text-xl font-bold">{editingNote ? "Update Note" : "New Note"}</h2>
                     {(editingNote || onClearEdit) && (
                         <Button type="button" variant="ghost" size="sm" onClick={() => {
                             if (onClearEdit) onClearEdit();
