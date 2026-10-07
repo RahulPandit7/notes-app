@@ -3,6 +3,8 @@ import { NoteCard } from "@/components/NoteCard";
 import AddNoteForm from "@/components/AddNoteForm";
 import type { Note } from "@/types/note";
 import { useOutletContext } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 export default function FavoriteNotesPage() {
     const { showAddForm, setShowAddForm, editingNote, setEditingNote } = useOutletContext<{
@@ -66,7 +68,21 @@ export default function FavoriteNotesPage() {
                 )}
 
                 <div className={showAddForm || editingNote ? "lg:col-span-1" : "w-full"}>
-                    <h2 className="text-2xl font-semibold mb-6">Favorite Notes</h2>
+                    <div className="flex justify-between items-center mb-6">
+                        {editingNote ? (
+                            <h2 className="text-md font-semibold text-gray-700"></h2>
+                        ) : (
+                            <h2 className="text-md font-semibold text-gray-700">Favorite Notes</h2>
+                        )}
+                        {!showAddForm && !editingNote && (
+                            <Button
+                                onClick={() => setShowAddForm(true)}
+                                className="flex items-center gap-1 cursor-pointer bg-primary hover:bg-primary/95"
+                            >
+                                <Plus size={16} /> Add New Note
+                            </Button>
+                        )}
+                    </div>
                     {favoriteNotes.length === 0 ? (
                         <p className="text-muted-foreground text-center py-12">No favorite notes.</p>
                     ) : (

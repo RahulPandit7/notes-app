@@ -30,7 +30,7 @@ const TrashNotePage = () => {
 
     return (
         <div className="container mx-auto ">
-            <h2 className="text-2xl font-semibold mb-6">Trash Notes</h2>
+            <h2 className="text-md font-semibold text-gray-700 mb-6">Trash Notes</h2>
             {notes.length === 0 ? (
                 <p className="text-muted-foreground text-center py-12">No notes in Trash.</p>
             ) : (
