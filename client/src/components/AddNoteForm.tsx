@@ -95,7 +95,7 @@ export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormPro
                         </Button>
                     )}
                 </div>
-                <div className="mb-4 h-[400px]">
+                <div className="mb-4 h-[300px] md:h-[400px]">
                     <Editor
                         title={methods.watch("title")}
                         content={methods.watch("content")}
