@@ -1,7 +1,10 @@
 import { NoteCard } from "@/components/NoteCard";
 import { useFetchTrashNotesQuery, useRestoreMutation, useDeleteForeverMutation } from "@/store/api/noteApi";
+import { NoteFormPanel } from "@/components/NoteFormPanel";
+import { useNoteForm } from "@/hooks/useNoteForm";
 
 const TrashNotePage = () => {
+const { showForm, editingNote, closeForm, startEditing } = useNoteForm();
     const { data: trashNotes, isError, isLoading } = useFetchTrashNotesQuery();
     const [restoreNote] = useRestoreMutation();
     const [deleteForeverNote] = useDeleteForeverMutation();
@@ -30,6 +33,7 @@ const TrashNotePage = () => {
 
     return (
         <div className="container mx-auto ">
+        <NoteFormPanel showForm={showForm} editingNote={editingNote} onClose={closeForm} />
             <h2 className="text-md font-semibold text-gray-700 mb-6">Trash Notes</h2>
             {notes.length === 0 ? (
                 <p className="text-muted-foreground text-center py-12">No notes in Trash.</p>
@@ -40,6 +44,7 @@ const TrashNotePage = () => {
                             key={note.id}
                             note={note}
                             isTrash={true}
+                            onClick={() => startEditing(note)}
                             onRestore={() => handleRestore(note.id)}
                             onDeleteForever={() => handleDeleteForever(note.id)}
                         />

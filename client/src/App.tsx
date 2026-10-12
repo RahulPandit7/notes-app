@@ -5,7 +5,7 @@ import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/store/slices/authSlice';
-import { closeNoteForm } from '@/store/slices/uiSlice';
+import { closeNoteForm, openNoteForm } from '@/store/slices/uiSlice';
 import type { RootState } from '@/store/store';
 import type { Note } from '@/types/note';
 import {
@@ -26,6 +26,7 @@ import {
   FileText,
   LogOut,
   Moon,
+  PenLine,
   Pin,
   Star,
   Sun,
@@ -328,6 +329,35 @@ function App() {
               />
             </div>
           </div>
+
+          {/* Global FAB — Create New Note */}
+          {!isFormOpen && (
+            <button
+              type="button"
+              id="fab-create-note"
+              aria-label="Create new note"
+              onClick={() => dispatch(openNoteForm())}
+              className="
+                fixed bottom-6 right-6 z-50
+                flex items-center justify-center
+                h-14 w-14 rounded-2xl
+                bg-gradient-to-br from-[#FFE066] via-[#FFD23F] to-[#FFBF00]
+                shadow-lg shadow-[#FFD23F]/40
+                text-neutral-900
+                transition-all duration-300
+                hover:scale-110 hover:shadow-xl hover:shadow-[#FFD23F]/60
+                active:scale-95
+                focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFD23F]/60 focus-visible:ring-offset-2
+              "
+            >
+              {/* Pulse halo */}
+              <span
+                aria-hidden
+                className="absolute inset-0 rounded-2xl bg-[#FFD23F]/50 animate-ping [animation-duration:2.5s] pointer-events-none"
+              />
+              <PenLine size={22} strokeWidth={2.5} className="relative transition-transform duration-300 group-hover:-rotate-6" />
+            </button>
+          )}
         </main>
       </SidebarProvider>
     </TooltipProvider>
