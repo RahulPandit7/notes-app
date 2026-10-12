@@ -45,8 +45,13 @@ export default function HeroPage() {
             count: stats?.data?.totalCount ?? 0,
             icon: FileText,
             link: "/app/notes",
-            iconBg: "bg-blue-500/10 text-blue-500 group-hover:bg-blue-500/20",
-            borderHover: "hover:border-blue-500/40",
+            gradientWash: "from-blue-500/15 via-indigo-500/5 to-transparent dark:from-blue-500/20 dark:via-indigo-500/10",
+            topAccent: "from-blue-500 via-indigo-400 to-transparent",
+            glowColor: "bg-blue-500/25",
+            iconBg: "bg-blue-500/15 text-blue-600 dark:text-blue-400 ring-1 ring-blue-500/25 group-hover/card:bg-blue-500/25 group-hover/card:ring-blue-500/40",
+            borderHover: "hover:border-blue-500/50 hover:shadow-blue-500/15",
+            badgeBg: "bg-blue-500/10 text-blue-700 dark:text-blue-300 ring-1 ring-blue-500/30",
+            dotColor: "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]",
             badge: "Browse all",
         },
         {
@@ -55,8 +60,13 @@ export default function HeroPage() {
             count: stats?.data?.pinnedCount ?? 0,
             icon: Pin,
             link: "/app/pinned-notes",
-            iconBg: "bg-amber-500/10 text-amber-500 group-hover:bg-amber-500/20",
-            borderHover: "hover:border-amber-500/40",
+            gradientWash: "from-amber-500/15 via-orange-500/5 to-transparent dark:from-amber-500/20 dark:via-orange-500/10",
+            topAccent: "from-amber-500 via-orange-400 to-transparent",
+            glowColor: "bg-amber-500/25",
+            iconBg: "bg-amber-500/15 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/25 group-hover/card:bg-amber-500/25 group-hover/card:ring-amber-500/40",
+            borderHover: "hover:border-amber-500/50 hover:shadow-amber-500/15",
+            badgeBg: "bg-amber-500/10 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/30",
+            dotColor: "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]",
             badge: "Priority",
         },
         {
@@ -65,8 +75,13 @@ export default function HeroPage() {
             count: stats?.data?.favoritedCount ?? 0,
             icon: Star,
             link: "/app/favorite-notes",
-            iconBg: "bg-yellow-500/10 text-yellow-500 group-hover:bg-yellow-500/20",
-            borderHover: "hover:border-yellow-500/40",
+            gradientWash: "from-purple-500/15 via-pink-500/5 to-transparent dark:from-purple-500/20 dark:via-pink-500/10",
+            topAccent: "from-purple-500 via-pink-400 to-transparent",
+            glowColor: "bg-purple-500/25",
+            iconBg: "bg-purple-500/15 text-purple-600 dark:text-purple-400 ring-1 ring-purple-500/25 group-hover/card:bg-purple-500/25 group-hover/card:ring-purple-500/40",
+            borderHover: "hover:border-purple-500/50 hover:shadow-purple-500/15",
+            badgeBg: "bg-purple-500/10 text-purple-700 dark:text-purple-300 ring-1 ring-purple-500/30",
+            dotColor: "bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]",
             badge: "Curated",
         },
         {
@@ -75,8 +90,13 @@ export default function HeroPage() {
             count: stats?.data?.trashCount ?? 0,
             icon: Trash,
             link: "/app/trash-notes",
-            iconBg: "bg-rose-500/10 text-rose-500 group-hover:bg-rose-500/20",
-            borderHover: "hover:border-rose-500/40",
+            gradientWash: "from-rose-500/15 via-red-500/5 to-transparent dark:from-rose-500/20 dark:via-red-500/10",
+            topAccent: "from-rose-500 via-red-400 to-transparent",
+            glowColor: "bg-rose-500/25",
+            iconBg: "bg-rose-500/15 text-rose-600 dark:text-rose-400 ring-1 ring-rose-500/25 group-hover/card:bg-rose-500/25 group-hover/card:ring-rose-500/40",
+            borderHover: "hover:border-rose-500/50 hover:shadow-rose-500/15",
+            badgeBg: "bg-rose-500/10 text-rose-700 dark:text-rose-300 ring-1 ring-rose-500/30",
+            dotColor: "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]",
             badge: "Bin",
         },
     ];
@@ -180,36 +200,62 @@ export default function HeroPage() {
                             {statCards.map((card) => {
                                 const Icon = card.icon;
                                 return (
-                                    <Link key={card.title} to={card.link} className="group focus:outline-none">
+                                    <Link key={card.title} to={card.link} className="group/card focus:outline-none">
                                         <div
-                                            className={`h-full relative overflow-hidden p-3.5 sm:p-5 rounded-xl border border-border/60 bg-card/80 backdrop-blur-xs hover:bg-card hover:shadow-md transition-all duration-200 flex flex-col justify-between gap-3 sm:gap-4 ${card.borderHover}`}
+                                            className={`h-full relative overflow-hidden p-3.5 sm:p-5 rounded-2xl border border-border/70 bg-card/90 dark:bg-card/50 backdrop-blur-md shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between gap-3 sm:gap-4 ${card.borderHover}`}
                                         >
-                                            <div className="flex items-start justify-between gap-1.5">
-                                                <div className={`p-2 sm:p-2.5 rounded-lg shrink-0 transition-colors duration-200 ${card.iconBg}`}>
+                                            {/* Ambient gradient wash */}
+                                            <div
+                                                aria-hidden
+                                                className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${card.gradientWash} opacity-70 group-hover/card:opacity-100 transition-opacity duration-300`}
+                                            />
+
+                                            {/* Top accent light bar */}
+                                            <div
+                                                aria-hidden
+                                                className={`pointer-events-none absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${card.topAccent} opacity-50 group-hover/card:opacity-100 transition-opacity duration-300`}
+                                            />
+
+                                            {/* Ambient glow sphere */}
+                                            <div
+                                                aria-hidden
+                                                className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full ${card.glowColor} blur-2xl opacity-40 group-hover/card:scale-125 group-hover/card:opacity-80 transition-all duration-500`}
+                                            />
+
+                                            {/* Watermark ghost icon */}
+                                            <Icon
+                                                aria-hidden
+                                                className="pointer-events-none absolute -right-1.5 -bottom-1.5 sm:-right-2 sm:-bottom-2 h-14 w-14 sm:h-16 sm:w-16 text-foreground/[0.025] dark:text-white/[0.035] transition-transform duration-500 group-hover/card:scale-110 group-hover/card:-rotate-6"
+                                            />
+
+                                            {/* Card Header (Icon + Badge + Arrow) */}
+                                            <div className="relative z-10 flex items-start justify-between gap-1.5">
+                                                <div className={`p-2 sm:p-2.5 rounded-xl shrink-0 transition-transform duration-300 group-hover/card:scale-110 shadow-xs ${card.iconBg}`}>
                                                     <Icon className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2.2} />
                                                 </div>
-                                                <div className="flex items-center gap-1 shrink-0">
-                                                    <span className="text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 sm:px-2 rounded-full bg-muted/70 text-muted-foreground">
+                                                <div className="flex items-center gap-1.5 shrink-0">
+                                                    <span className={`inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-xs transition-colors ${card.badgeBg}`}>
+                                                        <span className={`h-1.5 w-1.5 rounded-full ${card.dotColor}`} />
                                                         {card.badge}
                                                     </span>
-                                                    <ArrowUpRight
-                                                        size={15}
-                                                        className="text-muted-foreground/60 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200 hidden sm:inline-block"
-                                                    />
+                                                    <span className="hidden sm:flex h-6 w-6 items-center justify-center rounded-full bg-muted/60 text-muted-foreground/70 opacity-0 group-hover/card:opacity-100 group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5 transition-all duration-200">
+                                                        <ArrowUpRight size={13} strokeWidth={2.5} />
+                                                    </span>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-0.5 sm:space-y-1">
+                                            {/* Card Stats & Description */}
+                                            <div className="relative z-10 space-y-0.5 sm:space-y-1">
                                                 <div className="flex items-baseline gap-1.5 sm:gap-2">
-                                                    <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground font-sans">
+                                                    <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground font-sans">
                                                         {card.count}
                                                     </span>
                                                     <span className="text-[11px] sm:text-xs text-muted-foreground font-medium">notes</span>
                                                 </div>
-                                                <h3 className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                                                <h3 className="text-xs sm:text-sm font-bold text-foreground group-hover/card:text-primary transition-colors truncate">
                                                     {card.title}
                                                 </h3>
-                                                <p className="text-[11px] sm:text-xs text-muted-foreground leading-snug sm:leading-relaxed line-clamp-1">
+                                                <p className="text-[11px] sm:text-xs text-muted-foreground/80 leading-snug sm:leading-relaxed line-clamp-1">
                                                     {card.description}
                                                 </p>
                                             </div>
