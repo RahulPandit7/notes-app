@@ -9,14 +9,29 @@ import {
     SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import { FileText, Pin, Star, Trash } from "lucide-react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useFetchNoteStatsQuery } from "../store/api/noteApi";
+import { useEffect } from "react";
 
 export function AppSidebar() {
     const location = useLocation();
+    const { isMobile, setOpenMobile } = useSidebar();
     const { data: stats } = useFetchNoteStatsQuery();
+
+    const handleNavClick = () => {
+        if (isMobile) {
+            setOpenMobile(false);
+        }
+    };
+
+    useEffect(() => {
+        if (isMobile) {
+            setOpenMobile(false);
+        }
+    }, [location.pathname, isMobile, setOpenMobile]);
 
     const noteMenus = [
         {
@@ -54,11 +69,12 @@ export function AppSidebar() {
                 <div className="flex items-center gap-2 font-bold text-lg group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 transition-all duration-200 ease-linear">
                     <Link
                         to="/app"
+                        onClick={handleNavClick}
                         className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground shadow-sm hover:scale-105 transition-transform shrink-0"
                     >
                         <FileText size={18} />
                     </Link>
-                    <Link to="/app">
+                    <Link to="/app" onClick={handleNavClick}>
                         <span
                             className="bg-gradient-to-r from-foreground via-foreground/90 to-foreground/75 bg-clip-text text-transparent group-data-[collapsible=icon]:hidden"
                         >
@@ -112,7 +128,7 @@ export function AppSidebar() {
                                             isActive={isActive}
                                             tooltip={item.title}
                                         >
-                                            <NavLink to={item.path}>
+                                            <NavLink to={item.path} onClick={handleNavClick}>
                                                 <Icon className="h-4 w-4 shrink-0" />
                                                 <span className="transition-all duration-200 ease-linear group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:overflow-hidden">
                                                     {item.title}
@@ -149,7 +165,7 @@ export function AppSidebar() {
                                             isActive={isActive}
                                             tooltip={item.title}
                                         >
-                                            <NavLink to={item.path}>
+                                            <NavLink to={item.path} onClick={handleNavClick}>
                                                 <Icon className="h-4 w-4 shrink-0" />
                                                 <span className="transition-all duration-200 ease-linear group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:overflow-hidden">
                                                     {item.title}
