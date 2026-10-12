@@ -82,9 +82,11 @@ export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormPro
         <FormProvider {...methods}>
             <form
                 onSubmit={methods.handleSubmit(onSubmit)}
-                className="space-y-4 w-full"
+                className="flex flex-col w-full"
+                style={{ maxHeight: "calc(100dvh - 120px)" }}
             >
-                <div className="flex justify-between items-center mb-4">
+                {/* Header row */}
+                <div className="flex justify-between items-center mb-3 flex-shrink-0">
                     <h2 className="text-xl font-bold">{editingNote ? "Update Note" : "New Note"}</h2>
                     {(editingNote || onClearEdit) && (
                         <Button type="button" variant="ghost" size="sm" onClick={() => {
@@ -95,7 +97,9 @@ export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormPro
                         </Button>
                     )}
                 </div>
-                <div className="mb-4 h-[300px] md:h-[400px]">
+
+                {/* Editor — grows to fill whatever space is left */}
+                <div className="flex-1 min-h-0 mb-3">
                     <Editor
                         title={methods.watch("title")}
                         content={methods.watch("content")}
@@ -103,7 +107,9 @@ export default function AddNoteForm({ editingNote, onClearEdit }: AddNoteFormPro
                         onChangeContent={(val) => methods.setValue("content", val, { shouldValidate: true, shouldDirty: true })}
                     />
                 </div>
-                <Button type="submit" disabled={isLoading} className="w-full">
+
+                {/* Submit button — always visible above keyboard */}
+                <Button type="submit" disabled={isLoading} className="w-full flex-shrink-0">
                     {isLoading ? "Saving..." : editingNote ? "Update Note" : "Add Note"}
                 </Button>
             </form>

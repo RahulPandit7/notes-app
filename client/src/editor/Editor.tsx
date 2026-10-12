@@ -513,76 +513,80 @@ export default function Editor({ title, content, onChangeTitle, onChangeContent 
                 }
             `}</style>
 
-            {/* Top Toolbar - Fixed */}
-            <div className="flex-shrink-0 flex flex-wrap items-center gap-y-1 border-b border-border/60 px-2 py-1.5 bg-muted/20">
-                <div className="flex items-center space-x-0.5">
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')} title="Bold">
-                        <Bold size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive('italic')} title="Italic">
-                        <Italic size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()} isActive={editor.isActive('underline')} title="Underline">
-                        <UnderlineIcon size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} isActive={editor.isActive('strike')} title="Strikethrough">
-                        <Strikethrough size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
+            {/* Top Toolbar */}
+            <div className="flex-shrink-0 flex items-center border-b border-border/60 bg-muted/20">
+                {/* Scrollable formatting buttons */}
+                <div className="flex-1 min-w-0 overflow-x-auto scrollbar-none">
+                    <div className="flex items-center space-x-0.5 px-2 py-1.5">
+                        <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')} title="Bold">
+                            <Bold size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
+                        <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive('italic')} title="Italic">
+                            <Italic size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
+                        <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()} isActive={editor.isActive('underline')} title="Underline">
+                            <UnderlineIcon size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
+                        <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} isActive={editor.isActive('strike')} title="Strikethrough">
+                            <Strikethrough size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
 
-                    <Divider />
+                        <Divider />
 
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} isActive={editor.isActive('heading', { level: 1 })} title="Heading 1">
-                        <Heading1 size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} isActive={editor.isActive('heading', { level: 2 })} title="Heading 2">
-                        <Heading2 size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} isActive={editor.isActive('heading', { level: 3 })} title="Heading 3">
-                        <Heading3 size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
+                        <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} isActive={editor.isActive('heading', { level: 1 })} title="Heading 1">
+                            <Heading1 size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
+                        <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} isActive={editor.isActive('heading', { level: 2 })} title="Heading 2">
+                            <Heading2 size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
+                        <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} isActive={editor.isActive('heading', { level: 3 })} title="Heading 3">
+                            <Heading3 size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
 
-                    <Divider />
+                        <Divider />
 
-                    <ToolbarButton onClick={() => { }} title="Align Left">
-                        <AlignLeft size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive('bulletList')} title="Bullet List">
-                        <List size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().toggleTaskList().run()} isActive={editor.isActive('taskList')} title="Task List">
-                        <ListTodo size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
+                        <ToolbarButton onClick={() => { }} title="Align Left">
+                            <AlignLeft size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
+                        <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive('bulletList')} title="Bullet List">
+                            <List size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
+                        <ToolbarButton onClick={() => editor.chain().focus().toggleTaskList().run()} isActive={editor.isActive('taskList')} title="Task List">
+                            <ListTodo size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
 
-                    <Divider />
+                        <Divider />
 
-                    <ToolbarButton
-                        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                        isActive={editor.isActive('blockquote')}
-                        title="Blockquote"
-                    >
-                        <Quote size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
-                    <ToolbarButton
-                        onClick={() => {
-                            if (editor.isActive('codeBlock')) {
-                                editor.chain().focus().toggleCodeBlock().run();
-                            } else if (!editor.state.selection.empty) {
-                                editor.chain().focus().toggleCode().run();
-                            } else {
-                                editor.chain().focus().toggleCodeBlock().run();
-                            }
-                        }}
-                        isActive={editor.isActive('codeBlock') || editor.isActive('code')}
-                        title="Code"
-                    >
-                        <Code size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
-                    <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Divider">
-                        <Minus size={15} strokeWidth={2.5} />
-                    </ToolbarButton>
+                        <ToolbarButton
+                            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                            isActive={editor.isActive('blockquote')}
+                            title="Blockquote"
+                        >
+                            <Quote size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
+                        <ToolbarButton
+                            onClick={() => {
+                                if (editor.isActive('codeBlock')) {
+                                    editor.chain().focus().toggleCodeBlock().run();
+                                } else if (!editor.state.selection.empty) {
+                                    editor.chain().focus().toggleCode().run();
+                                } else {
+                                    editor.chain().focus().toggleCodeBlock().run();
+                                }
+                            }}
+                            isActive={editor.isActive('codeBlock') || editor.isActive('code')}
+                            title="Code"
+                        >
+                            <Code size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
+                        <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Divider">
+                            <Minus size={15} strokeWidth={2.5} />
+                        </ToolbarButton>
+                    </div>
                 </div>
-                <div className="flex-1" />
-                <div className="flex items-center space-x-1 pr-1">
+
+                {/* Fixed action buttons — always visible on the right */}
+                <div className="flex-shrink-0 flex items-center gap-0.5 px-2 py-1.5 border-l border-border/60">
                     {/* Hidden image file input */}
                     <input
                         ref={fileInputRef}
