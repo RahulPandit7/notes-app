@@ -5,14 +5,21 @@ import type { Note } from "@/types/note";
 import { useOutletContext } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import { closeNoteForm } from "@/store/slices/uiSlice";
 
 export default function FavoriteNotesPage() {
+    const dispatch = useDispatch();
+    const isFormOpen = useSelector((state: RootState) => state.ui.isNoteFormOpen);
     const { showAddForm, setShowAddForm, editingNote, setEditingNote } = useOutletContext<{
         showAddForm: boolean;
         setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
         editingNote: Note | null;
         setEditingNote: React.Dispatch<React.SetStateAction<Note | null>>;
     }>();
+
+    const showForm = showAddForm || isFormOpen;
 
     const { data, isLoading, error } = useGetOwnNotesQuery();
     const [deleteNoteById] = useDeleteNoteMutation();
@@ -54,20 +61,21 @@ export default function FavoriteNotesPage() {
 
     return (
         <div className="container mx-auto ">
-            <div className={`grid gap-4 items-start ${showAddForm || editingNote ? "grid-cols-1 lg:grid-cols-1" : "grid-cols-1"}`}>
-                {(showAddForm || editingNote) && (
+            <div className={`grid gap-4 items-start ${showForm || editingNote ? "grid-cols-1 lg:grid-cols-1" : "grid-cols-1"}`}>
+                {(showForm || editingNote) && (
                     <div className="">
                         <AddNoteForm
                             editingNote={editingNote}
                             onClearEdit={() => {
                                 setEditingNote(null);
                                 setShowAddForm(false);
+                                dispatch(closeNoteForm());
                             }}
                         />
                     </div>
                 )}
 
-                <div className={showAddForm || editingNote ? "lg:col-span-1" : "w-full"}>
+                <div className={showForm || editingNote ? "lg:col-span-1" : "w-full"}>
                     <div className="flex justify-between items-center mb-6">
                         {editingNote ? (
                             <h2 className="text-md font-semibold text-gray-700"></h2>

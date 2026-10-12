@@ -1,18 +1,12 @@
 import { useDeleteNoteMutation, useGetOwnNotesQuery, useToggleFavoriteMutation, useTogglePinnedMutation } from "../store/api/noteApi";
-import AddNoteForm from "../components/AddNoteForm";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Note } from "@/types/note";
-import { useOutletContext } from "react-router-dom";
 import { NoteCard } from "@/components/NoteCard";
+import { NoteFormPanel } from "@/components/NoteFormPanel";
+import { useNoteForm } from "@/hooks/useNoteForm";
 
 export default function AllNotePage() {
-    const { showAddForm, setShowAddForm, editingNote, setEditingNote } = useOutletContext<{
-        showAddForm: boolean;
-        setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
-        editingNote: Note | null;
-        setEditingNote: React.Dispatch<React.SetStateAction<Note | null>>;
-    }>();
+    const { showForm, editingNote, openForm, closeForm, startEditing } = useNoteForm();
 
     const { data, isLoading, error } = useGetOwnNotesQuery();
     const [deleteNoteById] = useDeleteNoteMutation();
@@ -22,9 +16,6 @@ export default function AllNotePage() {
     const handleDeleteNote = async (id: number) => {
         try {
             await deleteNoteById(id).unwrap();
-            if (editingNote?.id === id) {
-                setEditingNote(null);
-            }
         } catch (error) {
             console.error("Error deleting note:", error);
         }
@@ -52,63 +43,40 @@ export default function AllNotePage() {
     const notes = data?.data ?? [];
 
     return (
-        <div className="container mx-auto ">
+        <div className="container mx-auto">
+            <NoteFormPanel showForm={showForm} editingNote={editingNote} onClose={closeForm} />
 
-            <div className={`grid gap-4 items-start ${showAddForm || editingNote ? "grid-cols-1 lg:grid-cols-1" : "grid-cols-1"}`}>
-                {(showAddForm || editingNote) && (
-                    <div className="">
-                        <AddNoteForm
-                            editingNote={editingNote}
-                            onClearEdit={() => {
-                                setEditingNote(null);
-                                setShowAddForm(false);
-                            }}
-                        />
-                    </div>
+            <div className="flex justify-between items-center mb-6">
+                {editingNote ? (
+                    <h2 className="text-md font-semibold text-gray-700">Recent Notes</h2>
+                ) : (
+                    <h2 className="text-md font-semibold text-gray-700">Notes</h2>
                 )}
+                {!showForm && (
+                    <Button
+                        onClick={openForm}
+                        className="flex items-center gap-1 cursor-pointer bg-primary hover:bg-primary/95"
+                    >
+                        <Plus size={16} /> Add New Note
+                    </Button>
+                )}
+            </div>
 
-                {/* Notes List */}
-                <div className={showAddForm || editingNote ? "lg:col-span-1" : "w-full"}>
-                    <div className="flex justify-between items-center mb-6">
-                        {editingNote ? (
-                            <h2 className="text-md font-semibold text-gray-700"></h2>
-                        ) : (
-                            <h2 className="text-md font-semibold text-gray-700">Notes</h2>
-                        )}
-                        {!showAddForm && !editingNote && (
-                            <Button
-                                onClick={() => setShowAddForm(true)}
-                                className="flex items-center gap-1 cursor-pointer bg-primary hover:bg-primary/95"
-                            >
-                                <Plus size={16} /> Add New Note
-                            </Button>
-                        )}
-                    </div>
-                    {editingNote && (
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-md font-semibold text-gray-700">Recent Notes</h2>
-                        </div>
-                    )}
-                    <div className={`grid ${showAddForm || editingNote ? "grid-cols-1 md:grid-cols-1 xl:grid-cols-2" : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3"} gap-2.5 sm:gap-4`}>
-                        {notes.length === 0 ? (
-                            <p className="text-muted-foreground col-span-full flex justify-center items-center py-12">No notes yet. Add one!</p>
-                        ) : (
-                            notes.map((note) => (
-                                <NoteCard
-                                    key={note.id}
-                                    note={note}
-                                    onClick={() => {
-                                        setEditingNote({ ...note });
-                                        setShowAddForm(false);
-                                    }}
-                                    onPinToggle={() => handelPinNote(note.id)}
-                                    onFavoriteToggle={() => handelFavoriteNote(note.id)}
-                                    onDelete={() => handleDeleteNote(note.id)}
-                                />
-                            ))
-                        )}
-                    </div>
-                </div>
+            <div className={`grid ${showForm ? "grid-cols-1 md:grid-cols-1 xl:grid-cols-2" : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3"} gap-2.5 sm:gap-4`}>
+                {notes.length === 0 ? (
+                    <p className="text-muted-foreground col-span-full flex justify-center items-center py-12">No notes yet. Add one!</p>
+                ) : (
+                    notes.map((note) => (
+                        <NoteCard
+                            key={note.id}
+                            note={note}
+                            onClick={() => startEditing(note)}
+                            onPinToggle={() => handelPinNote(note.id)}
+                            onFavoriteToggle={() => handelFavoriteNote(note.id)}
+                            onDelete={() => handleDeleteNote(note.id)}
+                        />
+                    ))
+                )}
             </div>
         </div>
     );
