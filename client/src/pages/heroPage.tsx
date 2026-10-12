@@ -82,7 +82,7 @@ export default function HeroPage() {
     ];
 
     return (
-        <div className=" mx-auto w-full pb-10 space-y-8 animate-in fade-in duration-300">
+        <div className="mx-auto w-full pb-10 space-y-8">
 
             {/* Note Editor Area (when open) */}
             {isFormOpen ? (
@@ -94,25 +94,26 @@ export default function HeroPage() {
             ) : (
                 <>
 
-                    {/* Quick Create Note Prompt */}
-                    <div
-                        onClick={() => dispatch(openNoteForm())}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                dispatch(openNoteForm());
-                            }
-                        }}
-                        className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-2xl p-4 sm:p-5 cursor-pointer
-               bg-gradient-to-r from-fuchsia-600 via-pink-500 to-purple-600
-               shadow-lg shadow-fuchsia-500/30
-               transition-all duration-300
-               hover:-translate-y-0.5 hover:shadow-xl hover:shadow-fuchsia-500/50
-               active:translate-y-0 active:scale-[0.99]
-               focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-fuchsia-400/50 focus-visible:ring-offset-2"
-                    >
+                    {/* Quick Create Note Prompt (Sticky on top during scroll) */}
+                    <div className="sticky top-0 z-30 -my-2 py-2 backdrop-blur-md bg-muted/40 transition-all">
+                        <div
+                            onClick={() => dispatch(openNoteForm())}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    dispatch(openNoteForm());
+                                }
+                            }}
+                            className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-2xl p-4 sm:p-5 cursor-pointer
+                   bg-gradient-to-r from-fuchsia-600 via-pink-500 to-purple-600
+                   shadow-lg shadow-fuchsia-500/30
+                   transition-all duration-300
+                   hover:-translate-y-0.5 hover:shadow-xl hover:shadow-fuchsia-500/50
+                   active:translate-y-0 active:scale-[0.99]
+                   focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-fuchsia-400/50 focus-visible:ring-offset-2"
+                        >
                         {/* Ambient glow blobs */}
                         <div
                             aria-hidden
@@ -165,49 +166,50 @@ export default function HeroPage() {
                             </span>
                         </div>
                     </div>
+                </div>
 
                     {/* Stats Navigation Grid */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground">
+                            <h2 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground mt-2">
                                 Overview & Collections
                             </h2>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                             {statCards.map((card) => {
                                 const Icon = card.icon;
                                 return (
                                     <Link key={card.title} to={card.link} className="group focus:outline-none">
                                         <div
-                                            className={`h-full relative overflow-hidden p-5 rounded-xl border border-border/60 bg-card/80 backdrop-blur-xs hover:bg-card hover:shadow-md transition-all duration-200 flex flex-col justify-between gap-4 ${card.borderHover}`}
+                                            className={`h-full relative overflow-hidden p-3.5 sm:p-5 rounded-xl border border-border/60 bg-card/80 backdrop-blur-xs hover:bg-card hover:shadow-md transition-all duration-200 flex flex-col justify-between gap-3 sm:gap-4 ${card.borderHover}`}
                                         >
-                                            <div className="flex items-start justify-between">
-                                                <div className={`p-2.5 rounded-lg transition-colors duration-200 ${card.iconBg}`}>
-                                                    <Icon size={20} strokeWidth={2.2} />
+                                            <div className="flex items-start justify-between gap-1.5">
+                                                <div className={`p-2 sm:p-2.5 rounded-lg shrink-0 transition-colors duration-200 ${card.iconBg}`}>
+                                                    <Icon className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2.2} />
                                                 </div>
-                                                <div className="flex items-center gap-1">
-                                                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted/70 text-muted-foreground">
+                                                <div className="flex items-center gap-1 shrink-0">
+                                                    <span className="text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 sm:px-2 rounded-full bg-muted/70 text-muted-foreground">
                                                         {card.badge}
                                                     </span>
                                                     <ArrowUpRight
-                                                        size={16}
-                                                        className="text-muted-foreground/60 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200"
+                                                        size={15}
+                                                        className="text-muted-foreground/60 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200 hidden sm:inline-block"
                                                     />
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-1">
-                                                <div className="flex items-baseline gap-2">
-                                                    <span className="text-3xl font-bold tracking-tight text-foreground font-sans">
+                                            <div className="space-y-0.5 sm:space-y-1">
+                                                <div className="flex items-baseline gap-1.5 sm:gap-2">
+                                                    <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground font-sans">
                                                         {card.count}
                                                     </span>
-                                                    <span className="text-xs text-muted-foreground font-medium">notes</span>
+                                                    <span className="text-[11px] sm:text-xs text-muted-foreground font-medium">notes</span>
                                                 </div>
-                                                <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                                                <h3 className="text-xs sm:text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                                                     {card.title}
                                                 </h3>
-                                                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-1">
+                                                <p className="text-[11px] sm:text-xs text-muted-foreground leading-snug sm:leading-relaxed line-clamp-1">
                                                     {card.description}
                                                 </p>
                                             </div>
